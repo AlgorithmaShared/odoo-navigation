@@ -12,10 +12,20 @@
         "views/navigation_group_views.xml",
     ],
     "assets": {
+        # Default sidebar colours: must follow MuK's own variables to see their values.
+        "web._assets_primary_variables": [
+            (
+                "after",
+                "muk_web_appsbar/static/src/scss/variables.scss",
+                "algorithma_navigation/static/src/scss/primary_variables.scss",
+            ),
+        ],
         "web.assets_backend": [
             "algorithma_navigation/static/src/**/*.js",
             "algorithma_navigation/static/src/**/*.xml",
-            "algorithma_navigation/static/src/**/*.scss",
+            # Top level only: static/src/scss/ holds the primary variables loaded above.
+            # (A "remove" here would also drop them from the included variables bundle.)
+            "algorithma_navigation/static/src/*.scss",
         ],
     },
     "post_init_hook": "post_init_hook",
