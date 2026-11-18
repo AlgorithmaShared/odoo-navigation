@@ -1,0 +1,92 @@
+.algorithma_group_icon_svg {
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.algorithma_group_color_widget, .algorithma_group_icon_widget {
+    .algorithma_color_controls, .algorithma_color_readonly, .algorithma_icon_preview {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        min-height: 28px;
+    }
+
+    input[type="color"] {
+        background: transparent;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        cursor: pointer;
+        height: 32px;
+        padding: 2px;
+        width: 36px;
+    }
+
+    .algorithma_color_swatch {
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        display: inline-block;
+        height: 18px;
+        width: 18px;
+    }
+
+    .algorithma_color_presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 8px;
+    }
+
+    .algorithma_color_preset {
+        border: 1px solid rgba(0, 0, 0, .18);
+        border-radius: 50%;
+        height: 24px;
+        width: 24px;
+    }
+
+    .algorithma_color_preset[aria-pressed="true"] {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    .algorithma_style_preview {
+        align-items: center;
+        background: var(--algorithma-group-tint, transparent);
+        border-inline-start: 3px solid var(--algorithma-group-accent, $border-color);
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        max-width: 300px;
+        padding: 8px 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .algorithma_icon_choices {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(6, 36px);
+        margin-top: 8px;
+    }
+
+    .algorithma_icon_choice {
+        align-items: center;
+        background: transparent;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        color: inherit;
+        display: flex;
+        height: 36px;
+        justify-content: center;
+        width: 36px;
+
+        &[aria-pressed="true"] {
+            border: 2px solid $o-brand-primary;
+            background: rgba($o-brand-primary, .10);
+        }
+    }
+
+    button:focus-visible, input:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+}

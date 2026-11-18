@@ -1,0 +1,63 @@
+.algorithma_nav_popover {
+    border: 1px solid #D3D8DE;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    width: 264px;
+    max-width: calc(100vw - 64px) !important;
+}
+
+.algorithma_nav_flyout {
+    background: #F8FAFC;
+    color: #272C31;
+}
+
+.algorithma_flyout_heading {
+    background: #DEE2E6;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 14px;
+}
+
+.algorithma_flyout_apps {
+    list-style: none;
+    margin: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 4px;
+
+    > li > a {
+        align-items: center;
+        border-radius: 5px;
+        color: inherit;
+        display: flex;
+        gap: 10px;
+        padding: 10px;
+        text-decoration: none;
+
+        &:hover {
+            background: #E7EBEF;
+        }
+
+        &:focus-visible {
+            background: #E7EBEF;
+            outline: 2px solid #5F6368;
+            outline-offset: -2px;
+        }
+    }
+
+    > li.active > a {
+        background: #E1E5EA;
+    }
+}
+
+.algorithma_flyout_app_icon {
+    flex-shrink: 0;
+    height: 22px;
+    width: 22px;
+}
+
+.algorithma_flyout_app_label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}

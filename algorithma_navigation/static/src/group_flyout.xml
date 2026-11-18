@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Original app data and native MuK navigation; no business permissions change. -->
+    <t t-name="algorithma_navigation.NavigationFlyout">
+        <div class="algorithma_nav_flyout" t-att-id="this.menuId"
+             role="menu" t-att-aria-label="this.props.section.name"
+             t-on-mouseenter="this.props.onEnter" t-on-mouseleave="this.props.onLeave"
+             t-on-focusin="this.props.onEnter" t-on-focusout="this.onFocusOut"
+             t-on-keydown="this.onKeydown">
+            <div class="algorithma_flyout_heading" role="presentation"
+                 t-out="this.props.section.name"/>
+            <ul class="algorithma_flyout_apps" role="presentation">
+                <li t-foreach="this.props.section.apps" t-as="app" t-key="app.id"
+                    role="presentation" t-att-class="{'active': app.id === this.props.activeId}">
+                    <a t-att-href="app.href" t-att-title="app.label"
+                       t-att-data-menu-id="app.id" t-att-data-menu-xmlid="app.xmlid"
+                       t-att-data-action-id="app.actionID"
+                       t-att-aria-current="app.id === this.props.activeId ? 'page' : undefined"
+                       t-on-click.prevent="() => this.props.onSelect(app)" role="menuitem">
+                        <img class="algorithma_flyout_app_icon" alt=""
+                             t-att-src="app.webIconData || '/base/static/description/icon.png'"/>
+                        <span class="algorithma_flyout_app_label" t-out="app.label"/>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,129 @@
+.mk_apps_sidebar_panel.algorithma_nav_grouped {
+    .algorithma_nav_group {
+        list-style: none;
+    }
+
+    .algorithma_nav_group_apps {
+        display: none;
+        margin: 0;
+    }
+
+    // Small and medium layouts show groups; app links live in the flyout.
+    .algorithma_nav_group_header {
+        display: none;
+    }
+}
+
+.mk_apps_sidebar_panel {
+    .mk_apps_sidebar_logo > img {
+        display: block;
+        width: 50%;
+        height: auto;
+    }
+
+    .algorithma_nav_group_compact {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        border-radius: 6px;
+        color: #5F6368;
+        cursor: pointer;
+        display: flex;
+        height: 40px;
+        justify-content: center;
+        margin: 2px 3px;
+        padding: 0;
+        width: 40px;
+
+        &:hover,
+        &.active,
+        &[aria-expanded="true"] {
+            background: #DEE2E6;
+        }
+
+        &:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: -2px;
+        }
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    .mk_sidebar_type_large .mk_apps_sidebar_panel {
+        .algorithma_nav_group_compact {
+            display: none;
+        }
+    }
+    // MuK puts the sidebar preference on the web-client body. Its grid has an
+    // automatic sidebar column; preserve the zero-width home/fullscreen modes.
+    .o_web_client.mk_sidebar_type_large:not(.o_home_menu_background):not(.o_fullscreen):not(.editor_has_snippets_hide_backend_navbar) {
+        > .mk_apps_sidebar_panel.algorithma_nav_grouped {
+            width: 224px;
+        }
+    }
+
+    .mk_sidebar_type_large .mk_apps_sidebar_panel.algorithma_nav_grouped {
+        .algorithma_nav_group + .algorithma_nav_group,
+        .algorithma_nav_group + .algorithma_nav_direct_app {
+            margin-top: 8px;
+        }
+
+        .algorithma_nav_group_header {
+            align-items: center;
+            background: var(--algorithma-group-tint, #DEE2E6);
+            border: 0;
+            border-inline-start: 3px solid var(--algorithma-group-accent, transparent);
+            color: $mk-appbar-color;
+            cursor: pointer;
+            display: flex;
+            font-size: 12px;
+            font-weight: 600;
+            gap: 8px;
+            padding: 10px 12px;
+            text-align: start;
+            width: 100%;
+
+            &:hover {
+                background: var(--algorithma-group-hover, #D3D8DE);
+            }
+
+            &:focus-visible {
+                outline: 2px solid currentColor;
+                outline-offset: -2px;
+            }
+
+            &[aria-expanded="true"] .algorithma_nav_group_chevron {
+                transform: rotate(90deg);
+            }
+        }
+
+        .algorithma_group_icon_svg {
+            color: var(--algorithma-group-accent, #5F6368);
+        }
+
+        .algorithma_nav_group_name {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .algorithma_nav_group_apps {
+            display: block;
+            background: #F8FAFC;
+
+            > li:not(.active):hover > a {
+                background: #E7EBEF;
+            }
+
+            > li.active > a {
+                background: #E1E5EA;
+                color: $mk-appbar-color;
+            }
+        }
+
+        .algorithma_nav_collapsed > .algorithma_nav_group_apps {
+            display: none;
+        }
+    }
+}

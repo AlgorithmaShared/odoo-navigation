@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="algorithma_navigation.AppsBar"
+       t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('mk_apps_sidebar_panel')]" position="attributes">
+            <attribute name="t-att-class">{'algorithma_nav_grouped': this.algorithmaNavigationGroups.length > 0}</attribute>
+        </xpath>
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]" position="attributes">
+            <attribute name="t-foreach">this.algorithmaNavigationStandaloneApps</attribute>
+        </xpath>
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]/li" position="attributes">
+            <attribute name="t-attf-class">nav-item algorithma_nav_direct_app {{ app.id === this.appMenuService.getCurrentApp()?.id ? 'active' : '' }}</attribute>
+        </xpath>
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]/li/a" position="attributes">
+            <attribute name="t-att-title">app.label</attribute>
+            <attribute name="t-att-aria-label">app.label</attribute>
+        </xpath>
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]" position="before">
+            <t t-foreach="this.algorithmaNavigationGroups" t-as="section" t-key="section.key">
+                <li class="algorithma_nav_group"
+                    t-att-class="{'algorithma_nav_collapsed': this.algorithmaNavigationState.collapsedKeys.includes(section.key)}">
+                    <t t-call="algorithma_navigation.CompactGroupButton"/>
+                    <button type="button" class="algorithma_nav_group_header"
+                            t-att-style="section.style"
+                            t-att-data-group-color="section.color" t-att-data-group-icon="section.icon"
+                            t-att-aria-expanded="this.algorithmaNavigationState.collapsedKeys.includes(section.key) ? 'false' : 'true'"
+                            t-att-aria-controls="'algorithma-nav-' + section.key"
+                            t-on-click="() => this.algorithmaToggleGroup(section.key)">
+                        <t t-if="section.icon" t-call="algorithma_navigation.GroupIcon">
+                            <t t-set="groupIcon" t-value="section.icon"/>
+                        </t>
+                        <span class="algorithma_nav_group_name" t-out="section.name"/>
+                        <i class="fa fa-angle-right algorithma_nav_group_chevron" aria-hidden="true"/>
+                    </button>
+                    <ul class="mk_apps_sidebar_menu algorithma_nav_group_apps"
+                        t-att-id="'algorithma-nav-' + section.key">
+                        <t t-foreach="section.apps" t-as="app" t-key="app.id">
+                            <t t-call="algorithma_navigation.AppLink"/>
+                        </t>
+                    </ul>
+                </li>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="algorithma_navigation.CompactGroupButton">
+        <button type="button" class="algorithma_nav_group_compact"
+                t-att-class="{'active': this.algorithmaGroupIsActive(section)}"
+                t-att-data-group-key="section.key" t-att-title="section.name"
+                t-att-aria-label="section.name" aria-haspopup="menu"
+                t-att-aria-expanded="this.algorithmaNavigationState.flyoutKey === section.key ? 'true' : 'false'"
+                t-att-aria-controls="'algorithma-flyout-' + section.key"
+                t-on-mouseenter="(event) => this.algorithmaOpenFlyout(section, event.currentTarget)"
+                t-on-mouseleave="this.algorithmaScheduleFlyoutClose"
+                t-on-click="(event) => this.algorithmaOpenFlyout(section, event.currentTarget, true)"
+                t-on-keydown="(event) => this.algorithmaFlyoutKeydown(event, section)">
+            <t t-call="algorithma_navigation.GroupIcon">
+                <t t-set="groupIcon" t-value="section.icon || 'folder'"/>
+            </t>
+        </button>
+    </t>
+
+    <!-- MuK AppsBar app-link markup, LGPL-3, MuK IT / Mathias Markl.
+         Keep the original app objects, link action and icon fallback intact. -->
+    <t t-name="algorithma_navigation.AppLink">
+        <li t-attf-class="nav-item {{ app.id === this.appMenuService.getCurrentApp()?.id ? 'active' : '' }}">
+            <a t-att-href="app.href"
+               t-att-title="app.label" t-att-aria-label="app.label"
+               t-att-data-menu-id="app.id"
+               t-att-data-menu-xmlid="app.xmlid"
+               t-att-data-action-id="app.actionID"
+               t-on-click.prevent="() => this._onAppClick(app)"
+               class="nav-link" role="menuitem">
+                <img t-if="app.webIconData" class="mk_apps_sidebar_icon" t-att-src="app.webIconData"/>
+                <img t-else="" class="mk_apps_sidebar_icon" src="/base/static/description/icon.png"/>
+                <span class="mk_apps_sidebar_name"><t t-out="app.label"/></span>
+            </a>
+        </li>
+    </t>
+</templates>

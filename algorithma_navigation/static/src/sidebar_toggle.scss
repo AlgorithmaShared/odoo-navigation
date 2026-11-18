@@ -1,0 +1,84 @@
+.o_main_navbar .algorithma_sidebar_toggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: var(--NavBar-entry-color, #{$o-navbar-entry-color});
+    cursor: pointer;
+    display: none;
+    flex-shrink: 0;
+    justify-content: center;
+    padding: 0 10px;
+
+    &:hover {
+        background: rgba(127, 127, 127, 0.15);
+    }
+}
+
+.algorithma_sidebar_control {
+    display: none;
+    list-style: none;
+    margin-bottom: 4px;
+}
+
+.algorithma_sidebar_control_button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    color: $mk-appbar-color;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    height: 40px;
+    margin: 0 3px;
+    padding: 0 9px;
+    width: calc(100% - 6px);
+
+    &:hover {
+        background: $mk-appbar-active;
+    }
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+.algorithma_sidebar_control_label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: start;
+}
+
+.algorithma_sidebar_toggle,
+.algorithma_sidebar_control_button {
+    &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: -3px;
+    }
+}
+
+.mk_sidebar_type_small {
+    .algorithma_sidebar_control_label {
+        display: none;
+    }
+
+    .algorithma_sidebar_control_button {
+        justify-content: center;
+        padding: 0;
+    }
+}
+
+// Medium screens already use MuK's compact rail. Offer expansion only when
+// the viewport has room for the full navigation, preserving native phone UI.
+@include media-breakpoint-up(lg) {
+    .o_web_client:is(.mk_sidebar_type_large, .mk_sidebar_type_small):not(.o_home_menu_background):not(.o_fullscreen):not(.editor_has_snippets_hide_backend_navbar) {
+        .o_main_navbar .algorithma_sidebar_toggle {
+            display: inline-flex;
+        }
+
+        .algorithma_sidebar_control {
+            display: list-item;
+        }
+    }
+}
