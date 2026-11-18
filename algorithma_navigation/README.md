@@ -5,9 +5,56 @@ AppsBar. Original application objects, icons, actions and Odoo access rights
 remain in use. Grouping changes the sidebar presentation without changing
 native menu parents or granting business access.
 
-This `19.0` package targets Odoo 19 and module version `19.0.1.3.0`. Use only
+This `19.0` package targets Odoo 19 and module version `19.0.1.4.0`. Use only
 the matching Odoo branch and MuK AppsBar major version. This addon does not
 perform an Odoo database migration.
+
+## Arranging the navigation by drag and drop
+
+Version `19.0.1.4.0` adds an edit mode to the wide sidebar. It is offered to
+settings administrators only and while **Apps gruppieren** is switched on.
+
+- Click the **pencil** next to **Navigation**. The sidebar shows every group,
+  empty ones included, and a box **Ohne Gruppe** for apps without a group.
+- **Drag an app** onto another position, into another group, or into **Ohne
+  Gruppe**. Apps without a group keep their native MuK order.
+- **Drag a group** by its grip to change the order of the groups.
+- **Neue Gruppe** creates a group and lets you type its name at once. The
+  buttons in a group header rename it, open its colour and symbol form, or
+  delete it. Deleting a group keeps its apps; they appear without a group.
+- Every drop is stored immediately for all users of the database. **Fertig**
+  or the check mark leaves the edit mode. Other users see the new arrangement
+  after reloading the web client.
+
+Apps hidden with **In Seitenleiste ausblenden** do not appear in the editor and
+keep their assignment. The editor needs a pointer; with the keyboard, use
+**App-Zuordnungen** instead. On the 46-pixel rail, on medium screens and on
+phones the pencil is not shown.
+
+Two server methods back the editor and refuse everyone except settings
+administrators: `get_sidebar_editor_config()` and `save_sidebar_layout(groups,
+ungrouped_menu_ids)`. A layout is a list of `{"id": group id, "menu_ids": [app
+ids]}` in display order. Assignments that are not mentioned stay untouched.
+
+The same version declares the `close` property of the group flyout, which Odoo
+passes to every popover; without it the flyout raised an error in developer mode.
+
+## Sidebar colours
+
+Since version `19.0.1.4.0` a light sidebar is the default look of this module:
+background `#D9DDE2`, text `#272C31`, highlight `#BCCDF0`. The values live in
+`static/src/scss/primary_variables.scss` and can be changed there or overridden
+by an earlier primary-variables file (`$algorithma-nav-default-background`,
+`$algorithma-nav-default-text`, `$algorithma-nav-default-active`).
+
+- The default replaces **MuK's stock colours only**. As soon as an administrator
+  picks other AppsBar colours in the MuK theme settings, those are used. The MuK
+  settings form keeps showing MuK's stock values while the default is active.
+- To keep MuK's stock dark sidebar, set `$algorithma-nav-default-palette: false`
+  in an earlier primary-variables file, or change one of the two MuK colours.
+- Group headers, app lists and rail icons choose their colours from the sidebar
+  background: light greys on a light sidebar, tints of the text colour on a
+  dark one.
 
 ## Configuration
 

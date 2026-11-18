@@ -1,7 +1,7 @@
 {
     "name": "Algorithma Navigation",
-    "version": "19.0.1.3.0",
-    "summary": "Optional app groups and direct app links for MuK AppsBar",
+    "version": "19.0.1.4.0",
+    "summary": "App groups for MuK AppsBar, arranged by drag and drop",
     "category": "Productivity",
     "author": "Algorithma Informatik GmbH",
     "license": "LGPL-3",

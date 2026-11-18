@@ -93,6 +93,114 @@ export function standaloneApps(apps, sections) {
     });
 }
 
+// ===== SIDEBAR EDITOR (drag and drop) =====
+// Pure layout helpers for the editor. A layout is
+//   { sections: [{ id, key, name, apps, color, icon, style }], ungrouped: [app] }
+// Every helper returns a new layout and never changes the app objects.
+
+/**
+ * Build the editor layout: every configured group, empty ones included, with
+ * its visible apps, followed by the apps that belong to no group.
+ */
+export function editorSections(apps, editorGroups) {
+    const seenAppIds = new Set();
+    const uniqueApps = apps.filter((app) => {
+        if (seenAppIds.has(app.id)) {
+            return false;
+        }
+        seenAppIds.add(app.id);
+        return true;
+    });
+    const appsById = new Map(uniqueApps.map((app) => [app.id, app]));
+    const assignedAppIds = new Set();
+    const seenGroupIds = new Set();
+    const sections = [];
+    for (const group of Array.isArray(editorGroups) ? editorGroups : []) {
+        if (
+            !group || !Number.isInteger(group.id) || group.id <= 0 ||
+            typeof group.name !== "string" || !group.name.trim() ||
+            !Array.isArray(group.menu_ids) || seenGroupIds.has(group.id)
+        ) {
+            continue;
+        }
+        seenGroupIds.add(group.id);
+        const groupApps = [];
+        for (const menuId of group.menu_ids) {
+            const app = appsById.get(menuId);
+            if (app && !assignedAppIds.has(menuId)) {
+                assignedAppIds.add(menuId);
+                groupApps.push(app);
+            }
+        }
+        const color = sanitizeGroupColor(group.color);
+        sections.push({
+            id: group.id, key: `group-${group.id}`, name: group.name, apps: groupApps,
+            color, icon: sanitizeGroupIcon(group.icon), style: groupStyle(color),
+        });
+    }
+    return { sections, ungrouped: uniqueApps.filter((app) => !assignedAppIds.has(app.id)) };
+}
+
+/**
+ * Move one app into a group, right after `previousMenuId` (or to the top when
+ * there is none). Without a target group the app leaves every group.
+ */
+export function moveApp(layout, menuId, targetGroupId, previousMenuId) {
+    let movedApp = null;
+    const withoutMovedApp = (apps) => apps.filter((app) => {
+        if (app.id === menuId) {
+            movedApp = app;
+            return false;
+        }
+        return true;
+    });
+    const sections = layout.sections.map((section) => ({ ...section, apps: withoutMovedApp(section.apps) }));
+    const ungrouped = withoutMovedApp(layout.ungrouped);
+    if (!movedApp) {
+        return layout;
+    }
+    if (targetGroupId === null || targetGroupId === undefined) {
+        return { sections, ungrouped: [...ungrouped, movedApp] };
+    }
+    const targetSection = sections.find((section) => section.id === targetGroupId);
+    if (!targetSection) {
+        return layout;
+    }
+    const previousIndex = targetSection.apps.findIndex((app) => app.id === previousMenuId);
+    targetSection.apps = [
+        ...targetSection.apps.slice(0, previousIndex + 1), movedApp,
+        ...targetSection.apps.slice(previousIndex + 1),
+    ];
+    return { sections, ungrouped };
+}
+
+/** Move one group right after `previousGroupId`, or to the top when there is none. */
+export function moveGroup(layout, groupId, previousGroupId) {
+    const movedSection = layout.sections.find((section) => section.id === groupId);
+    if (!movedSection) {
+        return layout;
+    }
+    const otherSections = layout.sections.filter((section) => section.id !== groupId);
+    const previousIndex = otherSections.findIndex((section) => section.id === previousGroupId);
+    return {
+        sections: [
+            ...otherSections.slice(0, previousIndex + 1), movedSection,
+            ...otherSections.slice(previousIndex + 1),
+        ],
+        ungrouped: layout.ungrouped,
+    };
+}
+
+/** Arguments for the server method save_sidebar_layout: ids only, in display order. */
+export function layoutPayload(layout) {
+    return {
+        groups: layout.sections.map((section) => ({
+            id: section.id, menu_ids: section.apps.map((app) => app.id),
+        })),
+        ungrouped_menu_ids: layout.ungrouped.map((app) => app.id),
+    };
+}
+
 /** Invalid, obsolete or unavailable browser storage simply starts expanded. */
 export function parseCollapsedGroupKeys(raw) {
     try {

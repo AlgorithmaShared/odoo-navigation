@@ -7,7 +7,7 @@ Configurable application groups for [MuK AppsBar](https://github.com/muk-it/odoo
 | Odoo | Branch | Status |
 | --- | --- | --- |
 | 18 | `18.0` | Tested; module version `18.0.1.3.0` |
-| 19 | `19.0` | Tested; module version `19.0.1.3.0` |
+| 19 | `19.0` | Tested; module version `19.0.1.4.0` |
 | 20 | `20.0` | Tested; module version `20.0.1.3.0` |
 
 This branch contains **Odoo 19 only**. Check out the matching branch for your server. This addon does not perform an Odoo database migration.
@@ -15,7 +15,9 @@ This branch contains **Odoo 19 only**. Check out the matching branch for your se
 ## Features
 
 - Editable app groups with optional colors and twelve bundled symbols.
+- **Arrange directly in the sidebar:** administrators click the pencil next to **Navigation** and drag apps into groups, between groups or out of every group, drag groups to reorder them, and create, rename or delete groups on the spot.
 - Central **Apps gruppieren** setting to switch grouping on or off without deleting assignments.
+- A light sidebar as the default look. Colours chosen in the MuK theme settings still win, and groups stay readable on a dark sidebar too.
 - Apps with an empty group appear directly after the groups, without a catch-all group.
 - A compact 46-pixel rail with group hover/click/keyboard flyouts and separate icons for ungrouped apps.
 - Administrators can hide individual sidebar apps for all users. This changes presentation, not access permissions.
@@ -35,8 +37,9 @@ No MuK source files need to be edited.
 - **Settings → General Settings → Navigation → Apps gruppieren** controls grouping for the entire database.
 - **Settings → Navigation → App-Gruppen** manages groups and their styles.
 - **Settings → Navigation → App-Zuordnungen** assigns apps, leaves individual apps ungrouped, or hides them from the sidebar.
+- The **pencil** next to **Navigation** in the wide sidebar (settings administrators only) opens the drag and drop editor. Every drop is saved at once and applies to all users.
 
-Save and reload the web client after configuration changes. Existing assignments and hidden-app choices survive switching grouping off and on. Original app permissions still apply.
+Changes made in the drag and drop editor show at once for the administrator; other users see them after reloading. Save and reload the web client after changes in the settings lists. Existing assignments and hidden-app choices survive switching grouping off and on. Original app permissions still apply.
 
 ## Validation
 
@@ -48,7 +51,7 @@ Run the standalone helper checks from this repository root:
 node scripts/test_navigation_groups.mjs
 ```
 
-These 14 checks require only Node.js. Native Odoo regression tests are in `algorithma_navigation/tests`; run them in an isolated database with `--test-enable --test-tags=/algorithma_navigation`.
+These 20 checks require only Node.js. Native Odoo regression tests are in `algorithma_navigation/tests`; run them in an isolated database with `--test-enable --test-tags=/algorithma_navigation`.
 
 See [the module README](algorithma_navigation/README.md) for further configuration and version notes.
 
