@@ -1,6 +1,6 @@
 {
     "name": "Algorithma Navigation",
-    "version": "18.0.1.3.0",
+    "version": "19.0.1.3.0",
     "summary": "Optional app groups and direct app links for MuK AppsBar",
     "category": "Productivity",
     "author": "Algorithma Informatik GmbH",

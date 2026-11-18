@@ -144,12 +144,10 @@ class NavigationItem(models.Model):
              "Ihre App-Berechtigungen und andere Zugriffswege bleiben erhalten.",
     )
 
-    _sql_constraints = [
-        (
-            "menu_unique", "unique(menu_id)",
-            "Eine App kann nur einer Gruppe zugeordnet werden. Entfernen Sie zuerst die bestehende Zuordnung.",
-        ),
-    ]
+    _menu_unique = models.Constraint(
+        "UNIQUE(menu_id)",
+        "Eine App kann nur einer Gruppe zugeordnet werden. Entfernen Sie zuerst die bestehende Zuordnung.",
+    )
 
     @api.constrains("menu_id")
     def _check_root_menu(self):

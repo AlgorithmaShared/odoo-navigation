@@ -26,7 +26,8 @@
         background: transparent;
         border: 0;
         border-radius: 6px;
-        color: #5F6368;
+        // The compact rail sits on MuK's configurable sidebar background.
+        color: $mk-appbar-color;
         cursor: pointer;
         display: flex;
         height: 40px;
@@ -39,6 +40,7 @@
         &.active,
         &[aria-expanded="true"] {
             background: #DEE2E6;
+            color: #1F2937;
         }
 
         &:focus-visible {
@@ -70,10 +72,15 @@
 
         .algorithma_nav_group_header {
             align-items: center;
-            background: var(--algorithma-group-tint, #DEE2E6);
+            // Tint an opaque light surface rather than the native dark rail.
+            background-color: #DEE2E6;
+            background-image: linear-gradient(
+                var(--algorithma-group-tint, transparent),
+                var(--algorithma-group-tint, transparent)
+            );
             border: 0;
             border-inline-start: 3px solid var(--algorithma-group-accent, transparent);
-            color: $mk-appbar-color;
+            color: #1F2937;
             cursor: pointer;
             display: flex;
             font-size: 12px;
@@ -84,7 +91,11 @@
             width: 100%;
 
             &:hover {
-                background: var(--algorithma-group-hover, #D3D8DE);
+                background-color: #D3D8DE;
+                background-image: linear-gradient(
+                    var(--algorithma-group-hover, transparent),
+                    var(--algorithma-group-hover, transparent)
+                );
             }
 
             &:focus-visible {
@@ -112,13 +123,18 @@
             display: block;
             background: #F8FAFC;
 
+            // MuK's text color belongs to its rail, not these light app rows.
+            > li > a {
+                color: #1F2937;
+            }
+
             > li:not(.active):hover > a {
                 background: #E7EBEF;
             }
 
             > li.active > a {
                 background: #E1E5EA;
-                color: $mk-appbar-color;
+                color: #1F2937;
             }
         }
 
