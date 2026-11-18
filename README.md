@@ -7,7 +7,7 @@ Configurable application groups for [MuK AppsBar](https://github.com/muk-it/odoo
 | Odoo | Branch | Status |
 | --- | --- | --- |
 | 18 | `18.0` | Tested; module version `18.0.1.3.0` |
-| 19 | — | No port or compatibility validation yet |
+| 19 | `19.0` | Tested; module version `19.0.1.3.0` |
 | 20 | `20.0` | Tested; module version `20.0.1.3.0` |
 
 This branch contains **Odoo 18 only**. Check out the matching branch for your server. This addon does not perform an Odoo database migration.
@@ -40,7 +40,7 @@ Save and reload the web client after configuration changes. Existing assignments
 
 ## Validation
 
-The matching Odoo 18 and 20 variants each passed 25 native navigation tests and eight isolated Chromium workflow checks. Odoo 20 also passed two native web tests. The workflows cover the settings save/reload cycle, direct ungrouped apps, group flyouts, central hiding and ordinary-user permissions.
+The Odoo 18, 19 and 20 variants each passed 25 native navigation tests. Isolated Chromium validation covered eight workflows on Odoo 18, twelve on Odoo 19 and eight on Odoo 20. Odoo 20 also passed two native web tests. The workflows cover the settings save/reload cycle, direct ungrouped apps, group flyouts, central hiding and ordinary-user permissions. Odoo 19 additionally includes rendered contrast checks for neutral and colored group headers, app rows and compact icons.
 
 Run the standalone helper checks from this repository root:
 
