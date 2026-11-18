@@ -2,7 +2,6 @@ import re
 
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, ValidationError
-from odoo.tools import str2bool
 
 
 GROUPING_ENABLED_PARAM = "algorithma_navigation.grouping_enabled"
@@ -111,10 +110,8 @@ class NavigationGroup(models.Model):
         ])
         return {
             "groups": self.get_sidebar_groups(),
-            "grouping_enabled": str2bool(
-                self.env["ir.config_parameter"].sudo().get_param(
-                    GROUPING_ENABLED_PARAM, "True"
-                ), True,
+            "grouping_enabled": self.env["ir.config_parameter"].sudo().get_bool(
+                GROUPING_ENABLED_PARAM, True,
             ),
             # Include assignments in archived groups: archiving changes grouping,
             # not an administrator's explicit choice to hide an app.
@@ -144,12 +141,10 @@ class NavigationItem(models.Model):
              "Ihre App-Berechtigungen und andere Zugriffswege bleiben erhalten.",
     )
 
-    _sql_constraints = [
-        (
-            "menu_unique", "unique(menu_id)",
-            "Eine App kann nur einer Gruppe zugeordnet werden. Entfernen Sie zuerst die bestehende Zuordnung.",
-        ),
-    ]
+    _menu_unique = models.Constraint(
+        "UNIQUE(menu_id)",
+        "Eine App kann nur einer Gruppe zugeordnet werden. Entfernen Sie zuerst die bestehende Zuordnung.",
+    )
 
     @api.constrains("menu_id")
     def _check_root_menu(self):

@@ -2,14 +2,14 @@
 <templates xml:space="preserve">
     <t t-name="algorithma_navigation.GroupColorField">
         <div class="algorithma_group_color_widget">
-            <div t-if="props.readonly" class="algorithma_color_readonly">
+            <div t-if="this.props.readonly" class="algorithma_color_readonly">
                 <span class="algorithma_color_swatch" t-att-style="this.value ? 'background-color:' + this.value : ''"/>
                 <span t-if="this.value" t-out="this.value"/>
                 <span t-else="">Keine Farbe</span>
             </div>
             <t t-else="">
                 <div class="algorithma_color_controls">
-                    <input type="color" t-att-id="props.id" t-att-value="this.value || '#64748B'"
+                    <input type="color" t-att-id="this.props.id" t-att-value="this.value || '#64748B'"
                            aria-label="Gruppenfarbe wählen" title="Gruppenfarbe wählen"
                            t-on-change="this.onColorChange"/>
                     <span t-if="this.value" class="algorithma_color_value" t-out="this.value"/>
@@ -25,9 +25,8 @@
                             t-on-click="() => this.setColor(color)"/>
                 </div>
                 <div class="algorithma_style_preview" t-att-style="this.previewStyle">
-                    <t t-if="this.previewIcon" t-call="algorithma_navigation.GroupIcon">
-                        <t t-set="groupIcon" t-value="this.previewIcon"/>
-                    </t>
+                    <t t-if="this.previewIcon" t-call="algorithma_navigation.GroupIcon"
+                       groupIcon="this.previewIcon"/>
                     <span t-out="this.previewName"/>
                 </div>
             </t>
@@ -37,21 +36,18 @@
     <t t-name="algorithma_navigation.GroupIconField">
         <div class="algorithma_group_icon_widget">
             <div class="algorithma_icon_preview">
-                <t t-if="this.value" t-call="algorithma_navigation.GroupIcon">
-                    <t t-set="groupIcon" t-value="this.value"/>
-                </t>
+                <t t-if="this.value" t-call="algorithma_navigation.GroupIcon"
+                   groupIcon="this.value"/>
                 <span t-out="this.currentLabel"/>
             </div>
-            <t t-if="!props.readonly">
+            <t t-if="!this.props.readonly">
                 <div class="algorithma_icon_choices" role="group" aria-label="Gruppensymbol wählen">
                     <button t-foreach="this.options" t-as="option" t-key="option.key" type="button"
                             class="algorithma_icon_choice" t-att-data-icon="option.key"
                             t-att-title="option.label" t-att-aria-label="option.label"
                             t-att-aria-pressed="this.value === option.key ? 'true' : 'false'"
                             t-on-click="() => this.setIcon(option.key)">
-                        <t t-call="algorithma_navigation.GroupIcon">
-                            <t t-set="groupIcon" t-value="option.key"/>
-                        </t>
+                        <t t-call="algorithma_navigation.GroupIcon" groupIcon="option.key"/>
                     </button>
                 </div>
                 <button type="button" class="btn btn-link btn-sm algorithma_icon_clear" data-icon=""

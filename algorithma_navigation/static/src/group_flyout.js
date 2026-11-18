@@ -1,19 +1,19 @@
 /** @odoo-module **/
 
-import { Component, onMounted } from "@odoo/owl";
+import { Component, onMounted, t, useProps } from "@odoo/owl";
 
 /** Popup app links keep MuK's app objects and selection callback unchanged. */
 export class NavigationFlyout extends Component {
     static template = "algorithma_navigation.NavigationFlyout";
-    static props = {
-        section: Object,
-        activeId: { optional: true },
-        focusFirst: Boolean,
-        onEnter: Function,
-        onLeave: Function,
-        onClose: Function,
-        onSelect: Function,
-    };
+    props = useProps({
+        section: t.object(),
+        activeId: t.any().optional(),
+        focusFirst: t.boolean(),
+        onEnter: t.function(),
+        onLeave: t.function(),
+        onClose: t.function(),
+        onSelect: t.function(),
+    });
 
     setup() {
         onMounted(() => {

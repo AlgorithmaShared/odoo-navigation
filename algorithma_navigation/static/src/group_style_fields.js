@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component } from "@odoo/owl";
+import { Component, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
@@ -8,7 +8,7 @@ import { GROUP_ICON_KEYS, groupStyle, sanitizeGroupColor, sanitizeGroupIcon } fr
 
 export class GroupColorField extends Component {
     static template = "algorithma_navigation.GroupColorField";
-    static props = { ...standardFieldProps };
+    props = useProps(standardFieldProps);
 
     get value() {
         return sanitizeGroupColor(this.props.record.data[this.props.name]);
@@ -43,7 +43,7 @@ export class GroupColorField extends Component {
 
 export class GroupIconField extends Component {
     static template = "algorithma_navigation.GroupIconField";
-    static props = { ...standardFieldProps };
+    props = useProps(standardFieldProps);
 
     get value() {
         return sanitizeGroupIcon(this.props.record.data[this.props.name]);

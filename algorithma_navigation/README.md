@@ -1,11 +1,10 @@
-# Algorithma Navigation
+# Algorithma Navigation for Odoo 20
 
-Adds configurable, collapsible application groups to the existing MuK AppsBar.
-The original application icons and actions continue to be used. This module
-groups the user's accessible root applications for display; it does not change
-their Odoo menu parents or grant business access.
+Adds configurable, collapsible application groups to MuK AppsBar. The original
+application objects, icons and actions remain in use. Grouping only changes the
+sidebar presentation; it does not change menu parents or grant business access.
 
-Version `18.0.1.3.0` makes grouping optional. Administrators can disable it
+Version `20.0.1.3.0` makes grouping optional. Administrators can disable it
 for every user in the database without deleting group assignments. Individual
 ungrouped apps appear directly after the groups, including as individual icons
 in the compact rail. The half-size, centered sidebar logo is retained.
@@ -29,8 +28,9 @@ Navigation → App Groups**. Installation supplies editable starter groups for
 standard apps already installed. Empty or inaccessible groups are omitted.
 Reload the web client after saving changes.
 
-Each user/browser remembers collapsed groups separately for each database. A
-newly selected application opens its group. The compact group rail exposes each group's unhidden permitted apps through its flyout, independently of desktop group collapse.
+Collapse preferences are stored per database, user and browser. Selecting an app
+opens its group; a user can then collapse it again. The small sidebar and medium
+screen layout expose unhidden permitted apps in group flyouts, including closed groups.
 
 Use the **Navigation** arrow at the top of the sidebar, or the button beside
 Odoo's app switcher, to switch between the full grouped navigation and a
@@ -46,46 +46,55 @@ Medium-width screens use the same compact group rail; phones keep Odoo's existin
 app navigation. The hidden-sidebar preference, home view and fullscreen remain
 respected. Enter and Space activate either button.
 
-## Installation and removal
+## Version and implementation
 
-Depends only on `muk_web_appsbar`; install separately in each tenant database.
-The supported runtime for this package is Odoo 18. A MuK/Odoo major-version
-upgrade requires checking the component API and tests again. Uninstalling removes
-this module's group configuration and restores MuK's normal flat application
-list. It does not uninstall the business applications.
+This package is for **Odoo 20** and depends on `muk_web_appsbar`. Install it
+separately for each tenant database. Do not load the Odoo 18 variant alongside it.
 
-## Checks
+The frontend targets MuK AppsBar **20.0.1.2.8**. It uses Owl 3's `proxy` state and
+MuK's `appMenuService.selectApp` API. Field widgets use `useProps`, and shared
+icons receive explicit Owl 3 template parameters. The server returns ordered
+group names and menu IDs; app data and icon URLs come from the existing MuK menu service. Nested
+group lists omit MuK 20's additional list padding in the compact sidebar.
+The group chevron uses inline SVG because Odoo 20 no longer provides the old
+Font Awesome glyph; application icons remain unchanged.
 
-Run the Odoo tests with `--test-enable --test-tags=/algorithma_navigation` in an
-isolated database. The backend suite covers visibility, administrator-only
-configuration, duplicate assignments, sequence and preservation of native menus.
-Run the pure grouping/storage checks with
-`node scripts/test_navigation_groups.mjs` from the repository
-root. Browser validation must include grouped links, persistence, active-app
-opening, compact/medium layouts and the administrator form.
+Uninstalling removes this add-on's configuration and restores MuK's flat sidebar.
+It does not remove business applications. A later Odoo or MuK major version
+requires its own compatibility check.
 
-Version `18.0.1.2.0` passed nineteen backend tests, eleven shared helper checks
-and seven Chromium workflows. The checks cover permitted and hidden app
-filtering, compact group flyouts, hover and keyboard interaction, native app
-links/icons, and sidebar collapse. Hidden apps remain absent when their group
-is empty or archived and when the filtered flat fallback is shown.
+## Validation
 
-Earlier version 18.0.1.1.0 passed fifteen backend tests, eight pure helper checks and ten
-Chromium workflow checks. These cover color presets and custom hex values,
-saving/reloading and clearing styles, twelve symbol choices and previews,
-whole-sidebar persistence, compact/mobile layouts and restricted-user access.
-An actual 1.0.0-to-1.1.0 upgrade preserved existing configuration. No browser
-JavaScript or asset-loading errors occurred.
+Validated on Odoo **20.0-20261102**, PostgreSQL 16 and MuK AppsBar
+**20.0.1.2.8** with the full MuK theme. Version `20.0.1.2.0` passed nineteen
+backend tests, eleven shared helper checks and fifteen Chromium workflows.
+The checks cover permitted and hidden app filtering, compact group flyouts,
+hover and keyboard interaction, native app links/icons, and sidebar collapse.
+Hidden apps remain absent when their group is empty or archived and when the
+filtered flat fallback is shown. Odoo 20 validation used an isolated database;
+it is not a production deployment or an Odoo 18 database migration.
 
-Earlier version `18.0.1.1.1` changed the sidebar controls only. Eight focused Odoo 18
+Earlier version 20.0.1.1.0 passed fifteen backend
+tests, eight shared helper checks and fourteen real Chromium workflows. These
+covered color presets and custom values, all twelve SVG symbols and previews,
+their rendered path geometry, save/reload/clear, whole-sidebar collapse and
+persistence, keyboard focus, content width, compact/mobile layouts, restricted
+users and flat fallback.
+An actual 1.0.0-to-1.1.0 upgrade preserved all seven existing groups, three app
+assignments and 230 native menus; the six initial groups received their missing
+styles. No browser JavaScript, console or asset-loading errors occurred. This
+validation is not a production Odoo 20 deployment or an Odoo 18 database
+migration.
+
+Earlier version `20.0.1.1.1` changed the sidebar controls only. Nine focused Odoo 20
 browser workflows verified both buttons, the 224/46-pixel layouts, app links,
-tooltips and keyboard focus, reload/group-state persistence, native Small and
-Invisible preferences, and medium/mobile/home/fullscreen behavior. No browser
-JavaScript or asset errors occurred; Python model code was unchanged in that version.
+tooltips and keyboard focus, reload/group-state persistence, native Small
+preferences, and medium/mobile/home/fullscreen behavior. No browser JavaScript,
+console or asset errors occurred; Python model code was unchanged in that version.
 
 ## Credits and license
 
-LGPL-3. The sidebar markup is adapted from MuK AppsBar by MuK IT GmbH and
+LGPL-3. The sidebar link markup is adapted from MuK AppsBar by MuK IT GmbH and
 Mathias Markl, also LGPL-3. MuK source files are not overwritten. Original
 project: <https://github.com/muk-it/odoo-modules>.
 The twelve original inline SVG symbols are MIT-licensed; their notice is in

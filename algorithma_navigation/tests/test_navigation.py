@@ -20,15 +20,15 @@ class TestNavigationGroups(TransactionCase):
         super().setUpClass()
         cls.Group = cls.env["algorithma.navigation.group"]
         cls.Item = cls.env["algorithma.navigation.item"]
-        cls.env["ir.config_parameter"].sudo().set_param(GROUPING_ENABLED_PARAM, False)
+        cls.env["ir.config_parameter"].sudo().set_bool(GROUPING_ENABLED_PARAM, None)
         internal = cls.env.ref("base.group_user")
         cls.internal_user = cls.env["res.users"].with_context(no_reset_password=True).create({
             "name": "Navigation Reader", "login": "navigation-test-reader",
-            "groups_id": [Command.set([internal.id])],
+            "group_ids": [Command.set([internal.id])],
         })
         cls.portal_user = cls.env["res.users"].with_context(no_reset_password=True).create({
             "name": "Navigation Portal", "login": "navigation-test-portal",
-            "groups_id": [Command.set([cls.env.ref("base.group_portal").id])],
+            "group_ids": [Command.set([cls.env.ref("base.group_portal").id])],
         })
         cls.hidden_role = cls.env["res.groups"].create({"name": "Navigation Hidden Role"})
         cls.partner_action = cls.env["ir.actions.act_window"].create({
@@ -36,11 +36,11 @@ class TestNavigationGroups(TransactionCase):
         })
         cls.visible_menu = cls.env["ir.ui.menu"].create({
             "name": "Navigation Visible", "action": "ir.actions.act_window,%s" % cls.partner_action.id,
-            "groups_id": [Command.set([internal.id])], "sequence": 910,
+            "group_ids": [Command.set([internal.id])], "sequence": 910,
         })
         cls.second_menu = cls.visible_menu.copy({"name": "Navigation Second", "sequence": 920})
         cls.hidden_menu = cls.visible_menu.copy({
-            "name": "Navigation Hidden", "groups_id": [Command.set([cls.hidden_role.id])],
+            "name": "Navigation Hidden", "group_ids": [Command.set([cls.hidden_role.id])],
         })
         cls.child_menu = cls.visible_menu.copy({"name": "Navigation Child", "parent_id": cls.visible_menu.id})
         cls.group = cls.Group.create({"name": "Navigation Test Group", "sequence": 900})
@@ -78,7 +78,7 @@ class TestNavigationGroups(TransactionCase):
     def test_hidden_apps_preserve_legacy_payload_and_native_menu_access(self):
         self.assertFalse(self.line.hidden)
         original_payload = self._payload()
-        menu_fields = ["name", "parent_id", "action", "sequence", "web_icon", "active", "groups_id"]
+        menu_fields = ["name", "parent_id", "action", "sequence", "web_icon", "active", "group_ids"]
         original_menu = self.visible_menu.read(menu_fields)
         original_assignment = self.line.read(["group_id", "menu_id", "sequence"])
         self.assertEqual(self._config(), {
@@ -199,7 +199,7 @@ class TestNavigationGroups(TransactionCase):
         self.assertFalse(self.visible_menu.parent_id)
 
     def test_optional_group_preserves_hidden_app_without_native_menu_changes(self):
-        menu_fields = ["name", "parent_id", "action", "sequence", "active", "groups_id"]
+        menu_fields = ["name", "parent_id", "action", "sequence", "active", "group_ids"]
         original_menu = self.visible_menu.read(menu_fields)
         self.line.write({"group_id": False, "hidden": True})
         config = self._config()
@@ -226,7 +226,7 @@ class TestNavigationGroups(TransactionCase):
         self.assertTrue(Settings.default_get([field_name])[field_name])
         settings = Settings.create({field_name: False})
         settings.set_values()
-        self.assertEqual(self.env["ir.config_parameter"].get_param(GROUPING_ENABLED_PARAM), "False")
+        self.assertIs(self.env["ir.config_parameter"].get_bool(GROUPING_ENABLED_PARAM), False)
         self.assertFalse(Settings.default_get([field_name])[field_name])
         self.assertFalse(self._config()["grouping_enabled"])
         self.assertFalse(self.Group.get_sidebar_config()["grouping_enabled"])
@@ -246,7 +246,7 @@ class TestNavigationGroups(TransactionCase):
         self.line.write({"group_id": False, "hidden": True})
         self.Item.create({"group_id": self.group.id, "menu_id": self.second_menu.id, "hidden": True})
         self.group.active = False
-        self.env["ir.config_parameter"].set_param(GROUPING_ENABLED_PARAM, "False")
+        self.env["ir.config_parameter"].set_bool(GROUPING_ENABLED_PARAM, False)
         config = self._config(active_test=False)
         self.assertFalse(config["grouping_enabled"])
         self.assertNotIn(self.group.id, [group["id"] for group in config["groups"]])
@@ -263,7 +263,7 @@ class TestNavigationGroups(TransactionCase):
         with self.assertRaises(AccessError):
             self.Item.with_user(self.internal_user).create({"menu_id": self.second_menu.id})
         menu = self.env.ref("algorithma_navigation.menu_navigation_items")
-        self.assertEqual(menu.groups_id, self.env.ref("base.group_system"))
+        self.assertEqual(menu.group_ids, self.env.ref("base.group_system"))
         self.assertNotIn(menu.id, self.env["ir.ui.menu"].with_user(self.internal_user)._visible_menu_ids())
 
     def test_standalone_assignment_remains_unique_and_rejects_submenus(self):
@@ -340,11 +340,11 @@ class TestNavigationGroups(TransactionCase):
         finance.write({"color": False, "icon": "heart"})
         self.line.group_id = everyday
         before_items = self.Item.search([]).read(["group_id", "menu_id", "sequence"])
-        path = Path(__file__).resolve().parents[1] / "migrations" / "18.0.1.1.0" / "post-migrate.py"
+        path = Path(__file__).resolve().parents[1] / "migrations" / "20.0.1.1.0" / "post-migrate.py"
         spec = importlib.util.spec_from_file_location("navigation_style_migration", path)
         migration = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(migration)
-        migration.migrate(self.env.cr, "18.0.1.0.0")
+        migration.migrate(self.env.cr, "20.0.1.0.0")
         self.assertEqual((everyday.color, everyday.icon), ("#2563EB", "home"))
         self.assertEqual((sales.color, sales.icon), ("#abcdef", "chart"))
         self.assertEqual((finance.color, finance.icon), ("#7C3AED", "heart"))

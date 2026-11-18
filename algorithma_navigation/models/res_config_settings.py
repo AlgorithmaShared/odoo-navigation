@@ -20,8 +20,4 @@ class ResConfigSettings(models.TransientModel):
             raise AccessError(_("Nur Administratoren können die Navigation konfigurieren."))
         self.ensure_one()
         super().set_values()
-        # Native Boolean config parameters remove the key for False. With an
-        # enabled-by-default setting, keep an explicit False so disabling lasts.
-        self.env["ir.config_parameter"].sudo().set_param(
-            GROUPING_ENABLED_PARAM, str(self.algorithma_navigation_grouping_enabled),
-        )
+        # Odoo 20's native typed Boolean parameter API persists False itself.

@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { onWillDestroy, onWillStart, useState } from "@odoo/owl";
+import { onWillDestroy, onWillStart, proxy } from "@odoo/owl";
 import { AppsBar } from "@muk_web_appsbar/webclient/appsbar/appsbar";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { NavigationFlyout } from "./group_flyout";
@@ -28,7 +28,7 @@ patch(AppsBar.prototype, {
         } catch {
             // Navigation also works when browser storage is unavailable.
         }
-        this.algorithmaNavigationState = useState({ groups: [], hiddenMenuIds: [], groupingEnabled: true, collapsedKeys, flyoutKey: null });
+        this.algorithmaNavigationState = proxy({ groups: [], hiddenMenuIds: [], groupingEnabled: true, collapsedKeys, flyoutKey: null });
         this.algorithmaFlyout = usePopover(NavigationFlyout, {
             position: "right-start",
             animation: false,
@@ -160,7 +160,7 @@ patch(AppsBar.prototype, {
             onClose: (restoreFocus) => this.algorithmaCloseFlyout(restoreFocus),
             onSelect: (app) => {
                 this.algorithmaCloseFlyout();
-                return this._onAppClick(app);
+                return this.appMenuService.selectApp(app);
             },
         });
     },

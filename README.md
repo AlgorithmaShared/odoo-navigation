@@ -1,4 +1,4 @@
-# Algorithma Navigation for Odoo 18
+# Algorithma Navigation for Odoo 20
 
 Configurable application groups for [MuK AppsBar](https://github.com/muk-it/odoo-modules). Native app icons, actions and access rights are preserved.
 
@@ -10,7 +10,7 @@ Configurable application groups for [MuK AppsBar](https://github.com/muk-it/odoo
 | 19 | — | No port or compatibility validation yet |
 | 20 | `20.0` | Tested; module version `20.0.1.3.0` |
 
-This branch contains **Odoo 18 only**. Check out the matching branch for your server. This addon does not perform an Odoo database migration.
+This branch contains **Odoo 20 only**. Check out the matching branch for your server. This addon does not perform an Odoo database migration.
 
 ## Features
 
@@ -23,7 +23,7 @@ This branch contains **Odoo 18 only**. Check out the matching branch for your se
 
 ## Installation
 
-1. Use this repository's `18.0` branch with Odoo 18.
+1. Use this repository's `20.0` branch with Odoo 20.
 2. Install the matching MuK `muk_web_appsbar` and its dependencies from the MuK repository.
 3. Add this repository directory to Odoo's addons path, update the apps list and install `algorithma_navigation`.
 4. Install and configure the addon separately in each tenant database.

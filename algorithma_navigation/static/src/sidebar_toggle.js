@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { onMounted, onWillDestroy, useState } from "@odoo/owl";
+import { onMounted, onWillDestroy, proxy } from "@odoo/owl";
 import { AppsBar } from "@muk_web_appsbar/webclient/appsbar/appsbar";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
@@ -46,7 +46,7 @@ patch(NavBar.prototype, {
         super.setup(...arguments);
         this.algorithmaOriginalSidebarType = sidebarType();
         this.algorithmaSidebarStorageKey = storageKey();
-        this.algorithmaSidebarState = useState({
+        this.algorithmaSidebarState = proxy({
             collapsed: initialCollapsed(
                 this.algorithmaSidebarStorageKey, this.algorithmaOriginalSidebarType
             ),
@@ -106,7 +106,7 @@ patch(NavBar.prototype, {
 patch(AppsBar.prototype, {
     setup() {
         super.setup(...arguments);
-        this.algorithmaSidebarControlState = useState({
+        this.algorithmaSidebarControlState = proxy({
             collapsed: initialCollapsed(storageKey(), sidebarType()),
         });
         useBus(this.env.bus, STATE_EVENT, ({ detail }) => {

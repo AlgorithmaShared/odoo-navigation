@@ -19,18 +19,21 @@
             <t t-foreach="this.algorithmaNavigationGroups" t-as="section" t-key="section.key">
                 <li class="algorithma_nav_group"
                     t-att-class="{'algorithma_nav_collapsed': this.algorithmaNavigationState.collapsedKeys.includes(section.key)}">
-                    <t t-call="algorithma_navigation.CompactGroupButton"/>
+                    <t t-call="algorithma_navigation.CompactGroupButton" section="section"/>
                     <button type="button" class="algorithma_nav_group_header"
                             t-att-style="section.style"
                             t-att-data-group-color="section.color" t-att-data-group-icon="section.icon"
                             t-att-aria-expanded="this.algorithmaNavigationState.collapsedKeys.includes(section.key) ? 'false' : 'true'"
                             t-att-aria-controls="'algorithma-nav-' + section.key"
                             t-on-click="() => this.algorithmaToggleGroup(section.key)">
-                        <t t-if="section.icon" t-call="algorithma_navigation.GroupIcon">
-                            <t t-set="groupIcon" t-value="section.icon"/>
-                        </t>
+                        <t t-if="section.icon" t-call="algorithma_navigation.GroupIcon"
+                           groupIcon="section.icon"/>
                         <span class="algorithma_nav_group_name" t-out="section.name"/>
-                        <i class="fa fa-angle-right algorithma_nav_group_chevron" aria-hidden="true"/>
+                        <svg class="algorithma_nav_group_chevron" xmlns="http://www.w3.org/2000/svg"
+                             width="12" height="12" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                            <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor"
+                                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </button>
                     <ul class="mk_apps_sidebar_menu algorithma_nav_group_apps"
                         t-att-id="'algorithma-nav-' + section.key">
@@ -54,9 +57,7 @@
                 t-on-mouseleave="this.algorithmaScheduleFlyoutClose"
                 t-on-click="(event) => this.algorithmaOpenFlyout(section, event.currentTarget, true)"
                 t-on-keydown="(event) => this.algorithmaFlyoutKeydown(event, section)">
-            <t t-call="algorithma_navigation.GroupIcon">
-                <t t-set="groupIcon" t-value="section.icon || 'folder'"/>
-            </t>
+            <t t-call="algorithma_navigation.GroupIcon" groupIcon="section.icon || 'folder'"/>
         </button>
     </t>
 
@@ -69,10 +70,9 @@
                t-att-data-menu-id="app.id"
                t-att-data-menu-xmlid="app.xmlid"
                t-att-data-action-id="app.actionID"
-               t-on-click.prevent="() => this._onAppClick(app)"
+               t-on-click.prevent="() => this.appMenuService.selectApp(app)"
                class="nav-link" role="menuitem">
-                <img t-if="app.webIconData" class="mk_apps_sidebar_icon" t-att-src="app.webIconData"/>
-                <img t-else="" class="mk_apps_sidebar_icon" src="/base/static/description/icon.png"/>
+                <img class="mk_apps_sidebar_icon" t-att-src="app.webIconData || '/base/static/description/icon.png'"/>
                 <span class="mk_apps_sidebar_name"><t t-out="app.label"/></span>
             </a>
         </li>
