@@ -21,12 +21,14 @@
         height: auto;
     }
 
+    // Colours come from $algorithma-nav-* (see scss/primary_variables.scss), so
+    // text stays readable on a light and on a dark sidebar alike.
     .algorithma_nav_group_compact {
         align-items: center;
         background: transparent;
         border: 0;
         border-radius: 6px;
-        color: #5F6368;
+        color: $algorithma-nav-icon;
         cursor: pointer;
         display: flex;
         height: 40px;
@@ -38,7 +40,7 @@
         &:hover,
         &.active,
         &[aria-expanded="true"] {
-            background: #DEE2E6;
+            background: $algorithma-nav-neutral;
         }
 
         &:focus-visible {
@@ -70,7 +72,7 @@
 
         .algorithma_nav_group_header {
             align-items: center;
-            background: var(--algorithma-group-tint, #DEE2E6);
+            background: var(--algorithma-group-tint, #{$algorithma-nav-neutral});
             border: 0;
             border-inline-start: 3px solid var(--algorithma-group-accent, transparent);
             color: $mk-appbar-color;
@@ -84,7 +86,7 @@
             width: 100%;
 
             &:hover {
-                background: var(--algorithma-group-hover, #D3D8DE);
+                background: var(--algorithma-group-hover, #{$algorithma-nav-neutral-hover});
             }
 
             &:focus-visible {
@@ -98,7 +100,7 @@
         }
 
         .algorithma_group_icon_svg {
-            color: var(--algorithma-group-accent, #5F6368);
+            color: var(--algorithma-group-accent, #{$algorithma-nav-icon});
         }
 
         .algorithma_nav_group_name {
@@ -110,14 +112,14 @@
 
         .algorithma_nav_group_apps {
             display: block;
-            background: #F8FAFC;
+            background: $algorithma-nav-apps-background;
 
             > li:not(.active):hover > a {
-                background: #E7EBEF;
+                background: $algorithma-nav-apps-hover;
             }
 
             > li.active > a {
-                background: #E1E5EA;
+                background: $algorithma-nav-apps-active;
                 color: $mk-appbar-color;
             }
         }
