@@ -13,6 +13,9 @@ export class NavigationFlyout extends Component {
         onLeave: Function,
         onClose: Function,
         onSelect: Function,
+        // Odoo's popover hands every popover content a `close` function. It must be
+        // declared, otherwise OWL rejects the props in developer and test mode.
+        close: { type: Function, optional: true },
     };
 
     setup() {
