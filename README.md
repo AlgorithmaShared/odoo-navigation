@@ -7,8 +7,8 @@ Configurable application groups for [MuK AppsBar](https://github.com/muk-it/odoo
 | Odoo | Branch | Status |
 | --- | --- | --- |
 | 18 | `18.0` | Tested; module version `18.0.1.4.0` |
-| 19 | `19.0` | Tested; module version `19.0.1.3.0` |
-| 20 | `20.0` | Tested; module version `20.0.1.3.0` |
+| 19 | `19.0` | Tested; module version `19.0.1.4.0` |
+| 20 | `20.0` | Tested; module version `20.0.1.4.0` |
 
 This branch contains **Odoo 18 only**. Check out the matching branch for your server. This addon does not perform an Odoo database migration.
 
