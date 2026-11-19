@@ -141,6 +141,8 @@ API still uses `get_param`/`set_param`; the grouping setting preserves an explic
 
 ## Validation
 
+Version `19.0.1.4.0` passed 31 native Odoo tests and 20 helper checks on Odoo 19.0 with MuK AppsBar 19.0.1.1.13. Drag and drop, group creation, renaming and deletion were exercised by hand in a browser, in normal and developer mode; this repository contains no automated browser test for them.
+
 Validated against Odoo **19.0-20261112**, PostgreSQL 16 and the official MuK
 `19.0` branch pinned at commit `76019c27433db57276e206bd7b923a9699f9b5bd`
 (AppsBar **19.0.1.1.14**). Version **19.0.1.3.0** passed:
