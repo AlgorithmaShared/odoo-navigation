@@ -27,7 +27,7 @@ export class GroupColorField extends Component {
     }
 
     get previewName() {
-        return this.props.record.data.name || _t("Vorschau");
+        return this.props.record.data.name || _t("Preview");
     }
 
     setColor(value) {
@@ -55,7 +55,7 @@ export class GroupIconField extends Component {
     }
 
     get currentLabel() {
-        return this.options.find((option) => option.key === this.value)?.label || _t("Kein Symbol");
+        return this.options.find((option) => option.key === this.value)?.label || _t("No symbol");
     }
 
     setIcon(value) {
@@ -67,12 +67,12 @@ export class GroupIconField extends Component {
 
 registry.category("fields").add("algorithma_group_color", {
     component: GroupColorField,
-    displayName: _t("Gruppenfarbe"),
+    displayName: _t("Group color"),
     supportedTypes: ["char"],
 });
 
 registry.category("fields").add("algorithma_group_icon", {
     component: GroupIconField,
-    displayName: _t("Gruppensymbol"),
+    displayName: _t("Group symbol"),
     supportedTypes: ["selection"],
 });

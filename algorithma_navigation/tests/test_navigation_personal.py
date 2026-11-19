@@ -93,6 +93,9 @@ class TestNavigationPersonal(TransactionCase):
         self.assertEqual(editor_config["scope"], "personal")
         self.assertFalse(editor_config["has_personal_layout"])
         self.assertFalse(editor_config["can_edit_default"])
+        # The names of the twelve group symbols travel with the editor data.
+        self.assertEqual(len(editor_config["icon_labels"]), 12)
+        self.assertEqual(editor_config["icon_labels"]["home"], "Home")
         groups = {group["id"]: group for group in editor_config["editor_groups"]}
         self.assertEqual(groups[self.default_group.id]["menu_ids"], [self.app_a.id, self.app_b.id])
         self.assertEqual(groups[self.default_group.id]["color"], "#2563EB")
