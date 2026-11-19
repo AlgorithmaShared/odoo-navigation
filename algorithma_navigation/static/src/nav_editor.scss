@@ -16,11 +16,13 @@
     cursor: pointer;
     display: flex;
     flex-shrink: 0;
-    height: 32px;
+    // Deliberately smaller than the "Navigation" control next to it.
+    font-size: 11px;
+    height: 24px;
     justify-content: center;
-    margin-inline-end: 6px;
+    margin-inline-end: 8px;
     padding: 0;
-    width: 32px;
+    width: 24px;
 
     &:hover,
     &.active {
