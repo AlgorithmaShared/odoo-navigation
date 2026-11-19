@@ -44,7 +44,7 @@ Changes made in the drag and drop editor show at once for the person who made th
 
 ## Validation
 
-Version `19.0.1.4.0` passed 39 native Odoo tests and 23 helper checks on Odoo 19.0 with MuK AppsBar 19.0.1.1.13. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
+Version `19.0.1.4.0` passed 40 native Odoo tests and 23 helper checks on Odoo 19.0 with MuK AppsBar 19.0.1.1.13. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
 
 For version `1.3.0`: The Odoo 18, 19 and 20 variants each passed 25 native navigation tests. Isolated Chromium validation covered eight workflows on Odoo 18, twelve on Odoo 19 and eight on Odoo 20. Odoo 20 also passed two native web tests. The workflows cover the settings save/reload cycle, direct ungrouped apps, group flyouts, central hiding and ordinary-user permissions. Odoo 19 additionally includes rendered contrast checks for neutral and colored group headers, app rows and compact icons.
 
