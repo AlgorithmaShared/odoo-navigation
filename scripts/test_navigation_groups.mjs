@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const source = await readFile(new URL("../algorithma_navigation/static/src/group_apps.js", import.meta.url), "utf8");
-const { groupApps, standaloneApps, visibleApps, parseCollapsedGroupKeys, GROUP_ICON_KEYS, sanitizeGroupColor, sanitizeGroupIcon, groupStyle } = await import(
+const {
+    groupApps, standaloneApps, visibleApps, parseCollapsedGroupKeys, GROUP_ICON_KEYS,
+    sanitizeGroupColor, sanitizeGroupIcon, groupStyle,
+    editorSections, moveApp, moveGroup, layoutPayload,
+    GROUP_COLOR_PRESETS, addGroup, renameGroup, removeGroup, styleGroup, personalLayoutPayload,
+} = await import(
     `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`
 );
 let checks = 0;
@@ -129,5 +134,111 @@ check("all-unassigned and all-hidden configurations remain flat without duplicat
     const hidden = visibleApps(duplicateApps, [1, 2, 3, 4]);
     const grouped = groupApps(hidden, [group(10, [1, 2])]);
     assert.deepEqual(standaloneApps(hidden, grouped), []);
+});
+
+// ===== SIDEBAR EDITOR (drag and drop) =====
+// Layout used below: group 10 = [app 1, app 2], group 20 = [], apps 3 and 4 without a group.
+const editorGroups = Object.freeze([
+    Object.freeze({ id: 10, name: "First", menu_ids: Object.freeze([1, 2]), color: "#aB12fF", icon: "calendar" }),
+    Object.freeze({ id: 20, name: "Empty", menu_ids: Object.freeze([]), color: false, icon: false }),
+]);
+const appIds = (list) => list.map((item) => item.id);
+const sectionAppIds = (layout) => layout.sections.map((section) => appIds(section.apps));
+
+check("editor layout keeps empty groups, native order of ungrouped apps and original app objects", () => {
+    const layout = editorSections(apps, editorGroups);
+    assert.deepEqual(layout.sections.map((section) => section.key), ["group-10", "group-20"]);
+    assert.deepEqual(sectionAppIds(layout), [[1, 2], []]);
+    assert.deepEqual(appIds(layout.ungrouped), [3, 4]);
+    assert.equal(layout.sections[0].apps[0], apps[1]);
+    assert.equal(layout.sections[0].color, "#AB12FF");
+    assert.equal(layout.sections[0].icon, "calendar");
+    assert.equal(layout.sections[1].style, "");
+});
+check("editor layout ignores malformed groups, unknown apps and duplicate assignments", () => {
+    const layout = editorSections([...apps, apps[0]], [
+        null, { id: 0, name: "Zero", menu_ids: [1] }, { id: 5, name: " ", menu_ids: [1] },
+        { id: 10, name: "First", menu_ids: [1, 999, 1] }, { id: 10, name: "Again", menu_ids: [2] },
+        { id: 30, name: "Second", menu_ids: [1, 2] },
+    ]);
+    assert.deepEqual(layout.sections.map((section) => section.id), [10, 30]);
+    assert.deepEqual(sectionAppIds(layout), [[1], [2]]);
+    assert.deepEqual(appIds(layout.ungrouped), [3, 4]);
+    for (const invalid of [null, {}, "groups"]) {
+        assert.deepEqual(editorSections(apps, invalid), { sections: [], ungrouped: [...apps] });
+    }
+});
+check("moving an app places it after the given app, at the top, into an empty group or out of all groups", () => {
+    const layout = editorSections(apps, editorGroups);
+    assert.deepEqual(sectionAppIds(moveApp(layout, 3, 10, 1)), [[1, 3, 2], []]);
+    assert.deepEqual(sectionAppIds(moveApp(layout, 3, 10, null)), [[3, 1, 2], []]);
+    assert.deepEqual(sectionAppIds(moveApp(layout, 1, 10, 2)), [[2, 1], []]);
+    assert.deepEqual(sectionAppIds(moveApp(layout, 2, 20, null)), [[1], [2]]);
+    const ungroupedLayout = moveApp(layout, 1, null, null);
+    assert.deepEqual(sectionAppIds(ungroupedLayout), [[2], []]);
+    assert.deepEqual(appIds(ungroupedLayout.ungrouped), [3, 4, 1]);
+    assert.equal(moveApp(layout, 3, 10, 1).sections[0].apps[1], apps[0]);
+});
+check("moving an app never changes the previous layout and ignores unknown apps or groups", () => {
+    const layout = editorSections(apps, editorGroups);
+    const snapshot = JSON.stringify(layoutPayload(layout));
+    moveApp(layout, 3, 10, 1);
+    moveApp(layout, 1, null, null);
+    moveGroup(layout, 20, null);
+    assert.equal(JSON.stringify(layoutPayload(layout)), snapshot);
+    assert.equal(moveApp(layout, 999, 10, null), layout);
+    assert.equal(moveApp(layout, 1, 999, null), layout);
+    assert.equal(moveGroup(layout, 999, null), layout);
+});
+check("moving a group places it after the given group or at the top", () => {
+    const layout = editorSections(apps, [...editorGroups, { id: 30, name: "Third", menu_ids: [3] }]);
+    const groupIds = (result) => result.sections.map((section) => section.id);
+    assert.deepEqual(groupIds(moveGroup(layout, 30, null)), [30, 10, 20]);
+    assert.deepEqual(groupIds(moveGroup(layout, 10, 30)), [20, 30, 10]);
+    assert.deepEqual(groupIds(moveGroup(layout, 10, 20)), [20, 10, 30]);
+    assert.deepEqual(sectionAppIds(moveGroup(layout, 30, null)), [[3], [1, 2], []]);
+});
+check("layout payload sends only ids, in display order", () => {
+    const layout = moveGroup(moveApp(editorSections(apps, editorGroups), 4, 20, null), 20, null);
+    assert.deepEqual(layoutPayload(layout), {
+        groups: [{ id: 20, menu_ids: [4] }, { id: 10, menu_ids: [1, 2] }],
+        ungrouped_menu_ids: [3],
+    });
+});
+// ===== PERSONAL ARRANGEMENT =====
+check("a new personal group gets the next free number and starts empty and unstyled", () => {
+    const layout = editorSections(apps, editorGroups);
+    const { layout: withGroup, groupId } = addGroup(layout, "Mine");
+    assert.equal(groupId, 21);
+    assert.deepEqual(withGroup.sections.map((section) => section.id), [10, 20, 21]);
+    assert.deepEqual(withGroup.sections[2], { id: 21, key: "group-21", name: "Mine", apps: [], color: false, icon: false, style: "" });
+    assert.equal(addGroup({ sections: [], ungrouped: [...apps] }, "First").groupId, 1);
+    assert.deepEqual(sectionAppIds(layout), [[1, 2], []]);
+});
+check("renaming, styling and removing a personal group leave the other groups and the apps alone", () => {
+    const layout = editorSections(apps, editorGroups);
+    assert.deepEqual(renameGroup(layout, 20, "Renamed").sections.map((section) => section.name), ["First", "Renamed"]);
+    const styled = styleGroup(layout, 20, { color: "#2563eb", icon: "star" });
+    assert.equal(styled.sections[1].color, "#2563EB");
+    assert.equal(styled.sections[1].icon, "star");
+    assert.equal(styled.sections[1].style, groupStyle("#2563EB"));
+    const cleared = styleGroup(styled, 20, { color: "red;display:none", icon: "<svg>" });
+    assert.deepEqual([cleared.sections[1].color, cleared.sections[1].icon, cleared.sections[1].style], [false, false, ""]);
+    const removed = removeGroup(layout, 10);
+    assert.deepEqual(removed.sections.map((section) => section.id), [20]);
+    assert.deepEqual(appIds(removed.ungrouped), [3, 4, 1, 2]);
+    assert.equal(removeGroup(layout, 999), layout);
+    assert.equal(layout.sections[0].name, "First");
+    assert.equal(GROUP_COLOR_PRESETS.every((color) => sanitizeGroupColor(color) === color), true);
+});
+check("personal payload carries names, styles and app order of every group, empty ones included", () => {
+    const layout = styleGroup(moveApp(editorSections(apps, editorGroups), 4, 20, null), 20, { color: "#16A34A", icon: false });
+    assert.deepEqual(personalLayoutPayload(layout), [
+        { id: 10, name: "First", color: "#AB12FF", icon: "calendar", menu_ids: [1, 2] },
+        { id: 20, name: "Empty", color: "#16A34A", icon: false, menu_ids: [4] },
+    ]);
+    assert.deepEqual(personalLayoutPayload(addGroup({ sections: [], ungrouped: [] }, "Solo").layout), [
+        { id: 1, name: "Solo", color: false, icon: false, menu_ids: [] },
+    ]);
 });
 console.log(`${checks} navigation checks passed.`);

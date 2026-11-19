@@ -1,0 +1,406 @@
+/** @odoo-module **/
+// =============================================================================
+// Navigation editor: arrange app groups directly in the sidebar (Odoo 20, OWL 3)
+//
+// What it does
+//   Every internal user switches the sidebar into an edit mode. There they
+//   - drag apps into a group, between groups, or out of every group,
+//   - drag groups to change their order,
+//   - create, rename, colour and delete groups.
+//
+// Two layers ("scope")
+//   personal  the user's own arrangement. It is stored per user on the server
+//             and replaces the default for that user only. Its groups live
+//             inside the stored layout.
+//   default   the shared arrangement for everyone without an own one. Only
+//             settings administrators may edit it; its groups are records.
+//
+// Flow
+//   1. The pencil button in the sidebar toggles `algorithmaNavigationEditor.active`.
+//   2. <NavigationEditor/> loads the layer to edit from `get_sidebar_editor_config`.
+//      A user without an own arrangement starts from the default.
+//   3. Each change shows at once and is stored: the whole personal layout with
+//      `save_personal_sidebar_layout`, or the default with `save_sidebar_layout`
+//      and plain record writes. Saves run one after another.
+//   4. The server answer refreshes the editor and the normal sidebar.
+//
+// The server checks every call again; the buttons here are only a convenience.
+//
+// OWL 3 notes: state is a `proxy`, props come from `useProps`, the root element
+// is a signal ref (`this.rootRef()` returns the element).
+// =============================================================================
+
+import { Component, onPatched, onWillStart, proxy, signal, t, useProps } from "@odoo/owl";
+import { AppsBar } from "@muk_web_appsbar/webclient/appsbar/appsbar";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
+import { Mutex } from "@web/core/utils/concurrency";
+import { useBus, useService } from "@web/core/utils/hooks";
+import { patch } from "@web/core/utils/patch";
+import { useSortable } from "@web/core/utils/sortable_owl";
+// Load the grouping patch first: the editor builds on its state and methods.
+import "./appsbar";
+import {
+    addGroup, editorSections, GROUP_COLOR_PRESETS, GROUP_ICON_KEYS, layoutPayload, moveApp,
+    moveGroup, personalLayoutPayload, removeGroup, renameGroup, styleGroup,
+} from "./group_apps";
+
+// ===== CONSTANTS =====
+
+const GROUP_MODEL = "algorithma.navigation.group";
+const SIDEBAR_STATE_EVENT = "ALGORITHMA:NAVIGATION-STATE";
+const RENAME_INPUT_SELECTOR = ".algorithma_nav_edit_name_input";
+const SCOPE_PERSONAL = "personal";
+const SCOPE_DEFAULT = "default";
+
+// ===== EDITOR COMPONENT =====
+
+export class NavigationEditor extends Component {
+    static template = "algorithma_navigation.NavigationEditor";
+    props = useProps({
+        // Apps the user may see; apps hidden from the sidebar are left out.
+        apps: t.array(),
+        // Called with the fresh sidebar configuration after every stored change.
+        onConfigChanged: t.function(),
+        onClose: t.function(),
+    });
+    rootRef = signal.ref();
+
+    setup() {
+        this.orm = useService("orm");
+        this.dialog = useService("dialog");
+        // Saves run strictly one after another so a later drop never loses to an earlier one.
+        this.saveQueue = new Mutex();
+        this.pendingSaves = 0;
+        // Set when a rename starts; the name field gets the cursor once it is rendered.
+        this.renameInputNeedsFocus = false;
+        this.colorPresets = GROUP_COLOR_PRESETS;
+        // Symbols to choose from; their names arrive with the editor data, in the user's language.
+        this.iconChoices = [];
+        this.state = proxy({
+            sections: [],
+            ungrouped: [],
+            scope: SCOPE_PERSONAL,
+            hasPersonalLayout: false,
+            canEditDefault: false,
+            renamingGroupId: null,
+            renameValue: "",
+            // Group whose colour and symbol choices are open, if any.
+            stylingGroupId: null,
+        });
+
+        onWillStart(async () => {
+            // No scope wish: the server picks the layer this user usually edits.
+            this.showEditorConfig(await this.fetchEditorConfig(null));
+        });
+
+        // Apps: sortable inside a group and across all drop zones.
+        useSortable({
+            ref: this.rootRef,
+            elements: ".algorithma_nav_edit_app",
+            groups: ".algorithma_nav_dropzone",
+            connectGroups: true,
+            cursor: "grabbing",
+            placeholderClasses: ["visible", "algorithma_nav_drop_placeholder"],
+            onDrop: (dropParams) => this.onAppDrop(dropParams),
+        });
+        // Groups: sortable by their grip only, so the buttons in the header stay clickable.
+        useSortable({
+            ref: this.rootRef,
+            elements: ".algorithma_nav_edit_group",
+            handle: ".algorithma_nav_edit_grip",
+            cursor: "grabbing",
+            placeholderClasses: ["visible", "algorithma_nav_drop_placeholder"],
+            onDrop: (dropParams) => this.onGroupDrop(dropParams),
+        });
+
+        onPatched(() => {
+            if (!this.renameInputNeedsFocus) {
+                return;
+            }
+            const renameInput = this.rootRef()?.querySelector(RENAME_INPUT_SELECTOR);
+            if (renameInput) {
+                this.renameInputNeedsFocus = false;
+                renameInput.focus();
+                renameInput.select();
+            }
+        });
+    }
+
+    // ----- which layer is edited -----
+
+    get isPersonal() {
+        return this.state.scope === SCOPE_PERSONAL;
+    }
+
+    get hintText() {
+        if (!this.isPersonal) {
+            return _t("Default for all users without an arrangement of their own.");
+        }
+        return this.state.hasPersonalLayout
+            ? _t("Your own arrangement. It applies to you only.")
+            : _t("This is the default. Your first change creates your own arrangement.");
+    }
+
+    fetchEditorConfig(scope) {
+        return this.orm.call(GROUP_MODEL, "get_sidebar_editor_config", [], { scope });
+    }
+
+    /** Administrators switch between their own arrangement and the default for everyone. */
+    async switchScope(scope) {
+        if (scope === this.state.scope) {
+            return;
+        }
+        this.state.renamingGroupId = null;
+        this.state.stylingGroupId = null;
+        this.applyEditorConfig(await this.fetchEditorConfig(scope));
+    }
+
+    // ----- layout state -----
+
+    get layout() {
+        return { sections: this.state.sections, ungrouped: this.state.ungrouped };
+    }
+
+    showLayout(layout) {
+        this.state.sections = layout.sections;
+        this.state.ungrouped = layout.ungrouped;
+    }
+
+    /** Show a server answer in the editor. */
+    showEditorConfig(editorConfig) {
+        this.iconChoices = GROUP_ICON_KEYS.map((key) => ({ key, label: editorConfig.icon_labels?.[key] || key }));
+        this.showLayout(editorSections(this.props.apps, editorConfig.editor_groups));
+        this.state.scope = editorConfig.scope === SCOPE_DEFAULT ? SCOPE_DEFAULT : SCOPE_PERSONAL;
+        this.state.hasPersonalLayout = Boolean(editorConfig.has_personal_layout);
+        this.state.canEditDefault = Boolean(editorConfig.can_edit_default);
+    }
+
+    /** Refresh the editor and the normal sidebar from a server answer. */
+    applyEditorConfig(editorConfig) {
+        this.showEditorConfig(editorConfig);
+        this.props.onConfigChanged(editorConfig.config);
+    }
+
+    async reload() {
+        this.applyEditorConfig(await this.fetchEditorConfig(this.state.scope));
+    }
+
+    /** Show a changed layout at once, then store it in the layer that is edited. */
+    storeLayout(layout) {
+        this.showLayout(layout);
+        let method, args;
+        if (this.isPersonal) {
+            method = "save_personal_sidebar_layout";
+            args = [personalLayoutPayload(layout)];
+        } else {
+            const { groups, ungrouped_menu_ids } = layoutPayload(layout);
+            method = "save_sidebar_layout";
+            args = [groups, ungrouped_menu_ids];
+        }
+        this.pendingSaves++;
+        return this.saveQueue.exec(async () => {
+            try {
+                const editorConfig = await this.orm.call(GROUP_MODEL, method, args);
+                this.pendingSaves--;
+                // While further changes wait to be stored, their newer layout stays on screen.
+                if (this.pendingSaves === 0) {
+                    this.applyEditorConfig(editorConfig);
+                }
+            } catch (error) {
+                this.pendingSaves--;
+                // Drop the change that was not stored, then let Odoo report the error.
+                await this.reload();
+                throw error;
+            }
+        });
+    }
+
+    // ----- drag and drop -----
+
+    /** An app was dropped: `parent` is the drop zone, `previous` the row above it. */
+    onAppDrop({ element, group: sourceDropzone, parent: targetDropzone, previous }) {
+        const targetGroupId = Number(targetDropzone?.dataset.groupId) || null;
+        if (!targetGroupId && sourceDropzone === targetDropzone) {
+            // Apps without a group keep the native order; there is nothing to store.
+            return;
+        }
+        // Skip helper rows such as the "drop here" hint.
+        while (previous && !previous.dataset.menuId) {
+            previous = previous.previousElementSibling;
+        }
+        const previousMenuId = previous ? Number(previous.dataset.menuId) : null;
+        const menuId = Number(element.dataset.menuId);
+        return this.storeLayout(moveApp(this.layout, menuId, targetGroupId, previousMenuId));
+    }
+
+    /** A group was dropped: `previous` is the group above it, if any. */
+    onGroupDrop({ element, previous }) {
+        while (previous && !previous.dataset.groupId) {
+            previous = previous.previousElementSibling;
+        }
+        const previousGroupId = previous ? Number(previous.dataset.groupId) : null;
+        const groupId = Number(element.dataset.groupId);
+        return this.storeLayout(moveGroup(this.layout, groupId, previousGroupId));
+    }
+
+    // ----- groups: create, rename, delete -----
+    // Personal groups are part of the stored layout; default groups are records.
+
+    async addGroup() {
+        const name = _t("New group");
+        let groupId;
+        if (this.isPersonal) {
+            const added = addGroup(this.layout, name);
+            groupId = added.groupId;
+            await this.storeLayout(added.layout);
+        } else {
+            [groupId] = await this.orm.create(GROUP_MODEL, [{
+                name, sequence: (this.state.sections.length + 1) * 10,
+            }]);
+            await this.reload();
+        }
+        this.startRename(groupId);
+    }
+
+    startRename(groupId) {
+        const section = this.state.sections.find((candidate) => candidate.id === groupId);
+        if (section) {
+            this.renameInputNeedsFocus = true;
+            this.state.renameValue = section.name;
+            this.state.renamingGroupId = groupId;
+        }
+    }
+
+    onRenameInput(event) {
+        this.state.renameValue = event.target.value;
+    }
+
+    cancelRename() {
+        this.state.renamingGroupId = null;
+    }
+
+    async commitRename() {
+        const groupId = this.state.renamingGroupId;
+        const section = this.state.sections.find((candidate) => candidate.id === groupId);
+        const newName = this.state.renameValue.trim();
+        this.state.renamingGroupId = null;
+        // An empty or unchanged name keeps the old one.
+        if (!section || !newName || newName === section.name) {
+            return;
+        }
+        if (this.isPersonal) {
+            await this.storeLayout(renameGroup(this.layout, groupId, newName));
+        } else {
+            await this.orm.write(GROUP_MODEL, [groupId], { name: newName });
+            await this.reload();
+        }
+    }
+
+    onRenameKeydown(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            return this.commitRename();
+        }
+        if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            this.cancelRename();
+        }
+    }
+
+    deleteGroup(section) {
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Delete group"),
+            body: _t(
+                "The group “%s” will be deleted. Its apps stay and appear without a group afterwards.",
+                section.name
+            ),
+            confirmLabel: _t("Delete"),
+            confirmClass: "btn-danger",
+            cancelLabel: _t("Cancel"),
+            confirm: async () => {
+                if (this.isPersonal) {
+                    await this.storeLayout(removeGroup(this.layout, section.id));
+                } else {
+                    await this.orm.unlink(GROUP_MODEL, [section.id]);
+                    await this.reload();
+                }
+            },
+            cancel: () => {},
+        });
+    }
+
+    // ----- groups: colour and symbol -----
+
+    toggleStylePanel(section) {
+        this.state.stylingGroupId = this.state.stylingGroupId === section.id ? null : section.id;
+    }
+
+    /** `style` holds the colour, the symbol, or both; what is left out stays as it is. */
+    async setGroupStyle(section, style) {
+        const color = "color" in style ? style.color : section.color;
+        const icon = "icon" in style ? style.icon : section.icon;
+        if (this.isPersonal) {
+            await this.storeLayout(styleGroup(this.layout, section.id, { color, icon }));
+        } else {
+            await this.orm.write(GROUP_MODEL, [section.id], { color: color || false, icon: icon || false });
+            await this.reload();
+        }
+    }
+
+    // ----- back to the default -----
+
+    resetPersonalLayout() {
+        this.dialog.add(ConfirmationDialog, {
+            title: _t("Reset to default"),
+            body: _t("Your own arrangement will be deleted. You will see the default again afterwards."),
+            confirmLabel: _t("Reset"),
+            confirmClass: "btn-danger",
+            cancelLabel: _t("Cancel"),
+            confirm: async () => {
+                this.state.renamingGroupId = null;
+                this.state.stylingGroupId = null;
+                this.applyEditorConfig(
+                    await this.orm.call(GROUP_MODEL, "reset_personal_sidebar_layout", [])
+                );
+            },
+            cancel: () => {},
+        });
+    }
+}
+
+// ===== SIDEBAR INTEGRATION =====
+
+patch(AppsBar, {
+    components: { ...AppsBar.components, NavigationEditor },
+});
+
+patch(AppsBar.prototype, {
+    setup() {
+        super.setup(...arguments);
+        this.algorithmaNavigationEditor = proxy({ active: false });
+        // Editing needs the wide sidebar: leave the edit mode when it is collapsed.
+        useBus(this.env.bus, SIDEBAR_STATE_EVENT, ({ detail }) => {
+            if (detail.collapsed) {
+                this.algorithmaNavigationEditor.active = false;
+            }
+        });
+    },
+
+    /** Every user may arrange the own sidebar while grouping is switched on. */
+    get algorithmaCanEditNavigation() {
+        return this.algorithmaNavigationState.groupingEnabled;
+    },
+
+    get algorithmaNavigationEditorLabel() {
+        return this.algorithmaNavigationEditor.active
+            ? _t("Finish arranging")
+            : _t("Arrange groups and apps");
+    },
+
+    algorithmaToggleNavigationEditor() {
+        this.algorithmaCloseFlyout();
+        this.algorithmaNavigationEditor.active = !this.algorithmaNavigationEditor.active;
+    },
+});
