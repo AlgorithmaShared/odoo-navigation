@@ -201,6 +201,61 @@ export function layoutPayload(layout) {
     };
 }
 
+// ----- personal arrangement: groups live inside the layout, not on the server -----
+
+/** Colours offered in the editor; the same set as in the group form. */
+export const GROUP_COLOR_PRESETS = Object.freeze([
+    "#2563EB", "#7C3AED", "#0D9488", "#16A34A", "#D97706", "#DC2626", "#DB2777", "#64748B",
+]);
+
+/** Add an empty group at the end. Returns the new layout and the number of the new group. */
+export function addGroup(layout, name) {
+    const groupId = Math.max(0, ...layout.sections.map((section) => section.id)) + 1;
+    const newSection = {
+        id: groupId, key: `group-${groupId}`, name, apps: [], color: false, icon: false, style: "",
+    };
+    return { layout: { sections: [...layout.sections, newSection], ungrouped: layout.ungrouped }, groupId };
+}
+
+/** Give a group another name. */
+export function renameGroup(layout, groupId, name) {
+    return {
+        sections: layout.sections.map((section) => section.id === groupId ? { ...section, name } : section),
+        ungrouped: layout.ungrouped,
+    };
+}
+
+/** Remove a group; its apps stay and move to the apps without a group. */
+export function removeGroup(layout, groupId) {
+    const removedSection = layout.sections.find((section) => section.id === groupId);
+    if (!removedSection) {
+        return layout;
+    }
+    return {
+        sections: layout.sections.filter((section) => section.id !== groupId),
+        ungrouped: [...layout.ungrouped, ...removedSection.apps],
+    };
+}
+
+/** Set colour and symbol of a group; anything but the known values clears them. */
+export function styleGroup(layout, groupId, { color, icon }) {
+    const cleanColor = sanitizeGroupColor(color);
+    return {
+        sections: layout.sections.map((section) => section.id === groupId
+            ? { ...section, color: cleanColor, icon: sanitizeGroupIcon(icon), style: groupStyle(cleanColor) }
+            : section),
+        ungrouped: layout.ungrouped,
+    };
+}
+
+/** Argument for save_personal_sidebar_layout: the whole personal arrangement. */
+export function personalLayoutPayload(layout) {
+    return layout.sections.map((section) => ({
+        id: section.id, name: section.name, color: section.color || false, icon: section.icon || false,
+        menu_ids: section.apps.map((app) => app.id),
+    }));
+}
+
 /** Invalid, obsolete or unavailable browser storage simply starts expanded. */
 export function parseCollapsedGroupKeys(raw) {
     try {

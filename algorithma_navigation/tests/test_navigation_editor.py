@@ -1,7 +1,9 @@
-"""Tests for the sidebar editor API (arranging the navigation by drag and drop).
+"""Tests for the sidebar editor API, shared default (arranging by drag and drop).
+
+The personal arrangement of a user is covered in test_navigation_personal.py.
 
 Covered here:
-- only settings administrators may read the editor data or store a layout,
+- only settings administrators may read or store the shared default,
 - the editor data lists empty groups and leaves out archived ones,
 - a stored layout sets the order of groups and of apps inside each group,
 - dragging an app out of every group keeps its "hidden" choice,
@@ -83,14 +85,18 @@ class TestNavigationEditor(TransactionCase):
         self.assertNotIn(self.empty_group.id, self._editor_groups())
         self.assertNotIn(self.empty_group.id, self._editor_groups(active_test=False))
 
-    def test_only_administrators_may_use_the_editor(self):
+    def test_only_administrators_may_edit_the_shared_default(self):
         layout = [{"id": self.group_two.id, "menu_ids": [self.app_a.id, self.app_b.id]}]
         for user in (self.internal_user, self.portal_user, self.env.ref("base.public_user")):
             with self.subTest(user=user.login):
                 with self.assertRaises(AccessError):
-                    self.Group.with_user(user).get_sidebar_editor_config()
+                    self.Group.with_user(user).get_sidebar_editor_config("default")
                 with self.assertRaises(AccessError):
                     self.Group.with_user(user).save_sidebar_layout(layout, [])
+        # Portal and public users get no editor at all, not even for themselves.
+        for user in (self.portal_user, self.env.ref("base.public_user")):
+            with self.subTest(user=user.login), self.assertRaises(AccessError):
+                self.Group.with_user(user).get_sidebar_editor_config()
         self.assertEqual(self.item_a.group_id, self.group_one)
         self.assertEqual(self.item_b.group_id, self.group_one)
 

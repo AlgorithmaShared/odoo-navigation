@@ -13,8 +13,8 @@ in the compact rail. The half-size, centered sidebar logo is retained.
 
 ## Arranging the navigation by drag and drop
 
-Version `18.0.1.4.0` adds an edit mode to the wide sidebar. It is offered to
-settings administrators only and while **Apps gruppieren** is switched on.
+Version `18.0.1.4.0` adds an edit mode to the wide sidebar. Every internal user
+may use it while **Apps gruppieren** is switched on.
 
 - Click the **pencil** next to **Navigation**. The sidebar shows every group,
   empty ones included, and a box **Ohne Gruppe** for apps without a group.
@@ -22,21 +22,48 @@ settings administrators only and while **Apps gruppieren** is switched on.
   Gruppe**. Apps without a group keep their native MuK order.
 - **Drag a group** by its grip to change the order of the groups.
 - **Neue Gruppe** creates a group and lets you type its name at once. The
-  buttons in a group header rename it, open its colour and symbol form, or
-  delete it. Deleting a group keeps its apps; they appear without a group.
-- Every drop is stored immediately for all users of the database. **Fertig**
-  or the check mark leaves the edit mode. Other users see the new arrangement
-  after reloading the web client.
+  buttons in a group header rename it, choose its colour and symbol, or delete
+  it. Deleting a group keeps its apps; they appear without a group.
+- Every change is stored immediately. **Fertig** or the check mark leaves the
+  edit mode.
 
-Apps hidden with **In Seitenleiste ausblenden** do not appear in the editor and
-keep their assignment. The editor needs a pointer; with the keyboard, use
-**App-Zuordnungen** instead. On the 46-pixel rail, on medium screens and on
-phones the pencil is not shown.
+### An own arrangement per user, and a default for everyone
 
-Two server methods back the editor and refuse everyone except settings
-administrators: `get_sidebar_editor_config()` and `save_sidebar_layout(groups,
-ungrouped_menu_ids)`. A layout is a list of `{"id": group id, "menu_ids": [app
-ids]}` in display order. Assignments that are not mentioned stay untouched.
+Two layers exist:
+
+- **Own arrangement.** Each user arranges the own sidebar. It is stored per
+  user on the server, so it follows the user to every device, and it replaces
+  the default for that user only. A user without an own arrangement starts
+  from the default; the first change creates the own one. **Auf Standard
+  zurücksetzen** drops it again.
+- **Default.** The arrangement for everyone without an own one. Only settings
+  administrators may change it. In the editor they switch between **Für mich**
+  and **Für alle**. An administrator without an own arrangement edits the
+  default, as before.
+
+What to know:
+
+- Access rights are untouched: a user only ever sees and arranges apps that
+  user may open. Apps an administrator hid with **In Seitenleiste ausblenden**
+  stay hidden for everyone and do not appear in the editor.
+- A user with an own arrangement no longer follows later changes of the
+  default. Newly installed apps appear under **Ohne Gruppe** for that user.
+- Changes to the default reach other users after reloading the web client.
+- The editor needs a pointer; with the keyboard, administrators use
+  **App-Zuordnungen** for the default. On the 46-pixel rail, on medium screens
+  and on phones the pencil is not shown.
+
+Server methods behind the editor, all on `algorithma.navigation.group`:
+
+- `get_sidebar_editor_config(scope=None)` returns the layer to edit;
+  `scope` is `"personal"`, `"default"` (administrators only) or empty.
+- `save_personal_sidebar_layout(groups)` stores the caller's own arrangement:
+  a list of `{"id", "name", "color", "icon", "menu_ids"}` in display order.
+  It lives in the model `algorithma.navigation.user.layout`, one row per user.
+- `reset_personal_sidebar_layout()` drops the caller's own arrangement.
+- `save_sidebar_layout(groups, ungrouped_menu_ids)` stores the default and
+  refuses everyone except settings administrators. Assignments that are not
+  mentioned stay untouched.
 
 The same version declares the `close` property of the group flyout, which Odoo
 passes to every popover; without it the flyout raised an error in developer mode.

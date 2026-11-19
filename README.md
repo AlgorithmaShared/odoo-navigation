@@ -15,7 +15,8 @@ This branch contains **Odoo 18 only**. Check out the matching branch for your se
 ## Features
 
 - Editable app groups with optional colors and twelve bundled symbols.
-- **Arrange directly in the sidebar:** administrators click the pencil next to **Navigation** and drag apps into groups, between groups or out of every group, drag groups to reorder them, and create, rename or delete groups on the spot.
+- **Arrange directly in the sidebar:** click the pencil next to **Navigation** and drag apps into groups, between groups or out of every group, drag groups to reorder them, and create, rename, colour or delete groups on the spot.
+- **An own arrangement for every user:** each user arranges the own sidebar; it is stored per user and replaces the default for that user only. Administrators also keep the default for everyone without an own arrangement.
 - Central **Apps gruppieren** setting to switch grouping on or off without deleting assignments.
 - A light sidebar as the default look. Colours chosen in the MuK theme settings still win, and groups stay readable on a dark sidebar too.
 - Apps with an empty group appear directly after the groups, without a catch-all group.
@@ -37,13 +38,13 @@ No MuK source files need to be edited.
 - **Settings → General Settings → Navigation → Apps gruppieren** controls grouping for the entire database.
 - **Settings → Navigation → App-Gruppen** manages groups and their styles.
 - **Settings → Navigation → App-Zuordnungen** assigns apps, leaves individual apps ungrouped, or hides them from the sidebar.
-- The **pencil** next to **Navigation** in the wide sidebar (settings administrators only) opens the drag and drop editor. Every drop is saved at once and applies to all users.
+- The **pencil** next to **Navigation** in the wide sidebar opens the drag and drop editor. Every user edits the own arrangement there; administrators switch between **Für mich** and **Für alle** (the default). Every change is saved at once.
 
-Changes made in the drag and drop editor show at once for the administrator; other users see them after reloading. Save and reload the web client after changes in the settings lists. Existing assignments and hidden-app choices survive switching grouping off and on. Original app permissions still apply.
+Changes made in the drag and drop editor show at once for the person who made them; changes to the default reach other users after reloading. Save and reload the web client after changes in the settings lists. Existing assignments and hidden-app choices survive switching grouping off and on. Original app permissions still apply.
 
 ## Validation
 
-Version `18.0.1.4.0` passed 31 native Odoo tests and 20 helper checks on Odoo 18.0 with MuK AppsBar 18.0.1.1.6. Drag and drop, group creation, renaming and deletion were exercised by hand in a browser, in normal and developer mode; this repository contains no automated browser test for them.
+Version `18.0.1.4.0` passed 39 native Odoo tests and 23 helper checks on Odoo 18.0 with MuK AppsBar 18.0.1.1.6. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
 
 For version `1.3.0`: The Odoo 18, 19 and 20 variants each passed 25 native navigation tests. Isolated Chromium validation covered eight workflows on Odoo 18, twelve on Odoo 19 and eight on Odoo 20. Odoo 20 also passed two native web tests. The workflows cover the settings save/reload cycle, direct ungrouped apps, group flyouts, central hiding and ordinary-user permissions. Odoo 19 additionally includes rendered contrast checks for neutral and colored group headers, app rows and compact icons.
 
@@ -53,7 +54,7 @@ Run the standalone helper checks from this repository root:
 node scripts/test_navigation_groups.mjs
 ```
 
-These 20 checks require only Node.js. Native Odoo regression tests are in `algorithma_navigation/tests`; run them in an isolated database with `--test-enable --test-tags=/algorithma_navigation`.
+These 23 checks require only Node.js. Native Odoo regression tests are in `algorithma_navigation/tests`; run them in an isolated database with `--test-enable --test-tags=/algorithma_navigation`.
 
 See [the module README](algorithma_navigation/README.md) for further configuration and version notes.
 
