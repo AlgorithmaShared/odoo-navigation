@@ -47,8 +47,8 @@
                         t-att-aria-label="this.algorithmaNavigationEditorLabel"
                         t-att-aria-pressed="this.algorithmaNavigationEditor.active ? 'true' : 'false'"
                         t-on-click="this.algorithmaToggleNavigationEditor">
-                    <i t-att-class="this.algorithmaNavigationEditor.active ? 'fa fa-check' : 'fa fa-pencil'"
-                       aria-hidden="true"/>
+                    <t t-if="this.algorithmaNavigationEditor.active" t-call="algorithma_navigation.EditorIconCheck"/>
+                    <t t-else="" t-call="algorithma_navigation.EditorIconPencil"/>
                 </button>
             </li>
         </xpath>

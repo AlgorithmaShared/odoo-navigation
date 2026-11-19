@@ -313,3 +313,17 @@
         filter: brightness(1.1);
     }
 }
+
+// ===== SYMBOLS (Odoo 20: own SVGs instead of an icon font) =====
+
+.algorithma_nav_editor_icon {
+    display: block;
+    flex-shrink: 0;
+}
+
+// Centre the symbol inside the small header buttons.
+.algorithma_nav_edit_action {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+}
