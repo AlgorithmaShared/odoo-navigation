@@ -39,7 +39,7 @@
                         <path t-att-d="this.algorithmaSidebarControlState.collapsed ? 'm9 6 6 6-6 6' : 'm15 6-6 6 6 6'"/>
                     </svg>
                 </button>
-                <!-- Administrators only: switch the sidebar into the drag and drop edit mode. -->
+                <!-- Every user: switch the own sidebar into the drag and drop edit mode. -->
                 <button t-if="this.algorithmaCanEditNavigation" type="button"
                         class="algorithma_nav_edit_toggle"
                         t-att-class="{'active': this.algorithmaNavigationEditor.active}"

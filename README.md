@@ -2,6 +2,8 @@
 
 Configurable application groups for [MuK AppsBar](https://github.com/muk-it/odoo-modules). Native app icons, actions and access rights are preserved.
 
+![Odoo 18 with app groups in the MuK sidebar](docs/screenshots/01-sidebar-groups.png)
+
 ## Versions
 
 | Odoo | Branch | Status |
@@ -23,6 +25,42 @@ This branch contains **Odoo 18 only**. Check out the matching branch for your se
 - A compact 46-pixel rail with group hover/click/keyboard flyouts and separate icons for ungrouped apps.
 - Administrators can hide individual sidebar apps for all users. This changes presentation, not access permissions.
 - Group collapse and sidebar width are remembered per browser, user and database.
+
+## Screenshots
+
+Taken on Odoo 18.0 with MuK AppsBar 18.0.1.1.6 and the MuK theme, on a database without demo data. The texts of this addon are German.
+
+<table>
+  <tr valign="top">
+    <td rowspan="2">
+      <b>Edit mode</b><br>
+      The pencil turns the sidebar into an editor. Administrators switch between their own arrangement and the default for everyone.<br><br>
+      <img src="docs/screenshots/02-edit-mode.png" width="220" alt="Sidebar in edit mode: every group with its apps, a button for a new group and a box for apps without a group">
+    </td>
+    <td>
+      <b>Colour and symbol</b><br>
+      Chosen right in the header of a group, next to rename and delete.<br><br>
+      <img src="docs/screenshots/03-colour-and-symbol.png" width="220" alt="Group header with eight colours and twelve symbols to choose from">
+    </td>
+    <td>
+      <b>Drag and drop</b><br>
+      Apps move between groups; groups are reordered by their grip.<br><br>
+      <img src="docs/screenshots/04-drag-and-drop.png" width="220" alt="An app is dragged from one group into another">
+    </td>
+  </tr>
+  <tr valign="top">
+    <td>
+      <b>Own arrangement of a user</b><br>
+      Every user keeps an own arrangement with own groups and can go back to the default.<br><br>
+      <img src="docs/screenshots/06-own-arrangement.png" width="220" alt="Editor of an ordinary user with an own group and the link back to the default">
+    </td>
+    <td>
+      <b>Narrow rail</b><br>
+      On the 46-pixel rail a group opens as a fly-out.<br><br>
+      <img src="docs/screenshots/05-narrow-rail-flyout.png" width="220" alt="Narrow sidebar with the apps of one group in a fly-out">
+    </td>
+  </tr>
+</table>
 
 ## Installation
 
