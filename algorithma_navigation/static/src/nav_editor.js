@@ -49,14 +49,6 @@ const SIDEBAR_STATE_EVENT = "ALGORITHMA:NAVIGATION-STATE";
 const SCOPE_PERSONAL = "personal";
 const SCOPE_DEFAULT = "default";
 
-// Names of the group symbols, as in the group form.
-const GROUP_ICON_LABELS = {
-    home: _t("Haus"), briefcase: _t("Aktentasche"), folder: _t("Ordner"), receipt: _t("Beleg"),
-    users: _t("Personen"), settings: _t("Einstellungen"), calendar: _t("Kalender"),
-    building: _t("Gebäude"), chart: _t("Diagramm"), truck: _t("Fahrzeug"), star: _t("Stern"),
-    heart: _t("Herz"),
-};
-
 // ===== EDITOR COMPONENT =====
 
 export class NavigationEditor extends Component {
@@ -78,7 +70,8 @@ export class NavigationEditor extends Component {
         this.saveQueue = new Mutex();
         this.pendingSaves = 0;
         this.colorPresets = GROUP_COLOR_PRESETS;
-        this.iconChoices = GROUP_ICON_KEYS.map((key) => ({ key, label: GROUP_ICON_LABELS[key] || key }));
+        // Symbols to choose from; their names arrive with the editor data, in the user's language.
+        this.iconChoices = [];
         this.state = useState({
             sections: [],
             ungrouped: [],
@@ -136,11 +129,11 @@ export class NavigationEditor extends Component {
 
     get hintText() {
         if (!this.isPersonal) {
-            return _t("Standard für alle Benutzer ohne eigene Anordnung.");
+            return _t("Default for all users without an arrangement of their own.");
         }
         return this.state.hasPersonalLayout
-            ? _t("Deine eigene Anordnung. Sie gilt nur für dich.")
-            : _t("Das ist der Standard. Mit deiner ersten Änderung entsteht deine eigene Anordnung.");
+            ? _t("Your own arrangement. It applies to you only.")
+            : _t("This is the default. Your first change creates your own arrangement.");
     }
 
     fetchEditorConfig(scope) {
@@ -170,6 +163,7 @@ export class NavigationEditor extends Component {
 
     /** Show a server answer in the editor. */
     showEditorConfig(editorConfig) {
+        this.iconChoices = GROUP_ICON_KEYS.map((key) => ({ key, label: editorConfig.icon_labels?.[key] || key }));
         this.showLayout(editorSections(this.props.apps, editorConfig.editor_groups));
         this.state.scope = editorConfig.scope === SCOPE_DEFAULT ? SCOPE_DEFAULT : SCOPE_PERSONAL;
         this.state.hasPersonalLayout = Boolean(editorConfig.has_personal_layout);
@@ -248,7 +242,7 @@ export class NavigationEditor extends Component {
     // Personal groups are part of the stored layout; default groups are records.
 
     async addGroup() {
-        const name = _t("Neue Gruppe");
+        const name = _t("New group");
         let groupId;
         if (this.isPersonal) {
             const added = addGroup(this.layout, name);
@@ -306,14 +300,14 @@ export class NavigationEditor extends Component {
 
     deleteGroup(section) {
         this.dialog.add(ConfirmationDialog, {
-            title: _t("Gruppe löschen"),
+            title: _t("Delete group"),
             body: _t(
-                "Die Gruppe „%s“ wird gelöscht. Ihre Apps bleiben erhalten und erscheinen danach ohne Gruppe.",
+                "The group “%s” will be deleted. Its apps stay and appear without a group afterwards.",
                 section.name
             ),
-            confirmLabel: _t("Löschen"),
+            confirmLabel: _t("Delete"),
             confirmClass: "btn-danger",
-            cancelLabel: _t("Abbrechen"),
+            cancelLabel: _t("Cancel"),
             confirm: async () => {
                 if (this.isPersonal) {
                     await this.storeLayout(removeGroup(this.layout, section.id));
@@ -348,11 +342,11 @@ export class NavigationEditor extends Component {
 
     resetPersonalLayout() {
         this.dialog.add(ConfirmationDialog, {
-            title: _t("Auf Standard zurücksetzen"),
-            body: _t("Deine eigene Anordnung wird gelöscht. Du siehst danach wieder den Standard."),
-            confirmLabel: _t("Zurücksetzen"),
+            title: _t("Reset to default"),
+            body: _t("Your own arrangement will be deleted. You will see the default again afterwards."),
+            confirmLabel: _t("Reset"),
             confirmClass: "btn-danger",
-            cancelLabel: _t("Abbrechen"),
+            cancelLabel: _t("Cancel"),
             confirm: async () => {
                 this.state.renamingGroupId = null;
                 this.state.stylingGroupId = null;
@@ -390,8 +384,8 @@ patch(AppsBar.prototype, {
 
     get algorithmaNavigationEditorLabel() {
         return this.algorithmaNavigationEditor.active
-            ? _t("Anordnen beenden")
-            : _t("Gruppen und Apps anordnen");
+            ? _t("Finish arranging")
+            : _t("Arrange groups and apps");
     },
 
     algorithmaToggleNavigationEditor() {
