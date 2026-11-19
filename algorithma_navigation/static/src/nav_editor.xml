@@ -4,9 +4,23 @@
          Rows are plain list items, not links, so a click never leaves the page. -->
     <t t-name="algorithma_navigation.NavigationEditor">
         <div class="algorithma_nav_editor" t-ref="root">
-            <p class="algorithma_nav_editor_hint">
-                Apps und Gruppen mit der Maus verschieben. Die Anordnung gilt für alle Benutzer.
-            </p>
+            <!-- Administrators choose the layer: their own arrangement or the default for everyone. -->
+            <div t-if="state.canEditDefault" class="algorithma_nav_scope" role="group"
+                 aria-label="Anordnung bearbeiten für">
+                <button type="button" class="algorithma_nav_scope_option"
+                        t-att-class="{'active': this.isPersonal}"
+                        t-att-aria-pressed="this.isPersonal ? 'true' : 'false'"
+                        t-on-click="() => this.switchScope('personal')">Für mich</button>
+                <button type="button" class="algorithma_nav_scope_option"
+                        t-att-class="{'active': !this.isPersonal}"
+                        t-att-aria-pressed="this.isPersonal ? 'false' : 'true'"
+                        t-on-click="() => this.switchScope('default')">Für alle</button>
+            </div>
+            <p class="algorithma_nav_editor_hint" t-out="this.hintText"/>
+            <button t-if="this.isPersonal and state.hasPersonalLayout" type="button"
+                    class="algorithma_nav_reset" t-on-click="this.resetPersonalLayout">
+                Auf Standard zurücksetzen
+            </button>
 
             <div class="algorithma_nav_edit_groups">
                 <section t-foreach="state.sections" t-as="section" t-key="section.key"
@@ -36,7 +50,8 @@
                         </button>
                         <button type="button" class="algorithma_nav_edit_action"
                                 title="Farbe und Symbol" aria-label="Farbe und Symbol"
-                                t-on-click="() => this.openGroupStyle(section)">
+                                t-att-aria-expanded="state.stylingGroupId === section.id ? 'true' : 'false'"
+                                t-on-click="() => this.toggleStylePanel(section)">
                             <i class="fa fa-paint-brush" aria-hidden="true"/>
                         </button>
                         <button type="button" class="algorithma_nav_edit_action"
@@ -46,6 +61,38 @@
                         </button>
                         </span>
                     </div>
+
+                    <!-- Colour and symbol of the group, chosen in place. -->
+                    <div t-if="state.stylingGroupId === section.id" class="algorithma_nav_style_panel">
+                        <div class="algorithma_nav_style_row" role="group" aria-label="Farbe der Gruppe">
+                            <button t-foreach="this.colorPresets" t-as="color" t-key="color" type="button"
+                                    class="algorithma_nav_style_color"
+                                    t-att-style="'background-color:' + color"
+                                    t-att-title="color" t-att-aria-label="color"
+                                    t-att-aria-pressed="section.color === color ? 'true' : 'false'"
+                                    t-on-click="() => this.setGroupStyle(section, { color })"/>
+                            <button type="button" class="algorithma_nav_style_none"
+                                    title="Keine Farbe" aria-label="Keine Farbe"
+                                    t-att-aria-pressed="section.color ? 'false' : 'true'"
+                                    t-on-click="() => this.setGroupStyle(section, { color: false })">×</button>
+                        </div>
+                        <div class="algorithma_nav_style_row" role="group" aria-label="Symbol der Gruppe">
+                            <button t-foreach="this.iconChoices" t-as="choice" t-key="choice.key" type="button"
+                                    class="algorithma_nav_style_icon"
+                                    t-att-title="choice.label" t-att-aria-label="choice.label"
+                                    t-att-aria-pressed="section.icon === choice.key ? 'true' : 'false'"
+                                    t-on-click="() => this.setGroupStyle(section, { icon: choice.key })">
+                                <t t-call="algorithma_navigation.GroupIcon">
+                                    <t t-set="groupIcon" t-value="choice.key"/>
+                                </t>
+                            </button>
+                            <button type="button" class="algorithma_nav_style_none"
+                                    title="Kein Symbol" aria-label="Kein Symbol"
+                                    t-att-aria-pressed="section.icon ? 'false' : 'true'"
+                                    t-on-click="() => this.setGroupStyle(section, { icon: false })">×</button>
+                        </div>
+                    </div>
+
                     <ul class="algorithma_nav_dropzone" t-att-data-group-id="section.id"
                         t-att-aria-label="section.name">
                         <li t-foreach="section.apps" t-as="app" t-key="app.id"

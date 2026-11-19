@@ -6,6 +6,10 @@ from odoo.tools import str2bool
 
 
 GROUPING_ENABLED_PARAM = "algorithma_navigation.grouping_enabled"
+GROUP_COLOR_PATTERN = r"#[0-9a-fA-F]{6}"
+# Limits for a personal arrangement, to keep one user's stored layout small.
+PERSONAL_LAYOUT_MAX_GROUPS = 100
+PERSONAL_GROUP_NAME_MAX_LENGTH = 100
 
 
 GROUP_ICONS = [
@@ -48,7 +52,7 @@ class NavigationGroup(models.Model):
     @api.constrains("color")
     def _check_color(self):
         for group in self:
-            if group.color and not re.fullmatch(r"#[0-9a-fA-F]{6}", group.color):
+            if group.color and not re.fullmatch(GROUP_COLOR_PATTERN, group.color):
                 raise ValidationError(_("Bitte eine Farbe im Format #RRGGBB angeben, zum Beispiel #2563EB."))
 
     @api.model
@@ -88,6 +92,10 @@ class NavigationGroup(models.Model):
         by get_sidebar_config(). Caller context cannot bypass menu permissions.
         """
         visible_roots = self._get_sidebar_visible_root_ids()
+        personal_layout = self._get_personal_layout_record()
+        if personal_layout:
+            # A personal arrangement replaces the shared groups for this user only.
+            return self._clean_personal_groups(personal_layout.layout, visible_roots, keep_empty=False)
         result = []
         groups = self.sudo().with_context(active_test=True).search([("active", "=", True)])
         for group in groups:
@@ -124,39 +132,129 @@ class NavigationGroup(models.Model):
     # ------------------------------------------------------------------
     # Sidebar editor: arrange groups and apps by drag and drop
     # ------------------------------------------------------------------
-    # The arrangement is shared by every user of the database, so only
-    # settings administrators may read the editor data or store a layout.
-    # No sudo() is used for writing: the model access rights apply as well.
+    # Two layers exist:
+    #   default   the shared arrangement kept in this model. Only settings
+    #             administrators may change it.
+    #   personal  one arrangement per user (algorithma.navigation.user.layout).
+    #             Every internal user may keep one. It replaces the default
+    #             for that user only and never changes access rights.
+    # Personal layouts are read and written through sudo() and are always
+    # bound to the calling user. The default is written without sudo(), so
+    # the model access rights apply as well.
+
+    @api.model
+    def _is_sidebar_administrator(self):
+        return self.env.su or self.env.user.has_group("base.group_system")
 
     @api.model
     def _check_sidebar_editor_access(self):
-        """Refuse everyone except settings administrators."""
-        if not self.env.su and not self.env.user.has_group("base.group_system"):
-            raise AccessError(_("Nur Administratoren können die Navigation anordnen."))
+        """Refuse everyone except settings administrators (shared default)."""
+        if not self._is_sidebar_administrator():
+            raise AccessError(_("Nur Administratoren können die Navigation für alle anordnen."))
 
     @api.model
-    def get_sidebar_editor_config(self):
-        """Return the data the sidebar editor works on.
+    def _get_personal_layout_record(self):
+        """The personal arrangement of the calling user, if any."""
+        return self.env["algorithma.navigation.user.layout"].sudo().search(
+            [("user_id", "=", self.env.uid)], limit=1,
+        )
 
-        Unlike get_sidebar_groups(), empty groups are included so that apps can
-        be dragged into a group that was just created.
+    @api.model
+    def _clean_personal_groups(self, stored_groups, visible_roots, keep_empty):
+        """Turn a stored personal layout into the payload shape of shared groups.
+
+        Stored data is checked again on every read: unknown or meanwhile
+        inaccessible apps are dropped, and nothing but validated colours and
+        symbols reaches the browser.
         """
-        self._check_sidebar_editor_access()
-        visible_roots = self._get_sidebar_visible_root_ids()
+        icon_keys = {key for key, _label in GROUP_ICONS}
+        result, seen_group_ids, seen_menu_ids = [], set(), set()
+        for entry in stored_groups if isinstance(stored_groups, list) else []:
+            if not isinstance(entry, dict):
+                continue
+            group_id, name = entry.get("id"), entry.get("name")
+            if (
+                type(group_id) is not int or group_id <= 0 or group_id in seen_group_ids
+                or not isinstance(name, str) or not name.strip()
+            ):
+                continue
+            seen_group_ids.add(group_id)
+            menu_ids = []
+            for menu_id in entry.get("menu_ids") or []:
+                if type(menu_id) is int and menu_id in visible_roots and menu_id not in seen_menu_ids:
+                    seen_menu_ids.add(menu_id)
+                    menu_ids.append(menu_id)
+            if not menu_ids and not keep_empty:
+                continue
+            color, icon = entry.get("color"), entry.get("icon")
+            result.append({
+                "id": group_id, "name": name, "menu_ids": menu_ids,
+                "color": color if isinstance(color, str) and re.fullmatch(GROUP_COLOR_PATTERN, color) else False,
+                "icon": icon if icon in icon_keys else False,
+            })
+        return result
+
+    @api.model
+    def _get_shared_editor_groups(self, visible_roots):
+        """Every active shared group, empty ones included, for the editor."""
         editor_groups = []
         # Archived groups are not part of the navigation, whatever the caller context says.
-        for group in self.with_context(active_test=True).search([]):
+        for group in self.sudo().with_context(active_test=True).search([]):
             items = group.item_ids.sorted(key=lambda item: (item.sequence, item.id))
             editor_groups.append({
                 "id": group.id, "name": group.name,
                 "menu_ids": [item.menu_id.id for item in items if item.menu_id.id in visible_roots],
                 "color": group.color or False, "icon": group.icon or False,
             })
-        return {"editor_groups": editor_groups, "config": self.get_sidebar_config()}
+        return editor_groups
+
+    @api.model
+    def _resolve_sidebar_editor_scope(self, scope):
+        """Decide which layer the editor works on: "default" or "personal"."""
+        if scope == "default":
+            self._check_sidebar_editor_access()
+            return "default"
+        if scope == "personal":
+            return "personal"
+        if scope not in (None, False):
+            raise ValidationError(_("Unbekannter Bereich für die Navigation."))
+        # No wish given: an administrator without a personal arrangement keeps
+        # editing the shared default, everyone else their own arrangement.
+        if self._is_sidebar_administrator() and not self._get_personal_layout_record():
+            return "default"
+        return "personal"
+
+    @api.model
+    def get_sidebar_editor_config(self, scope=None):
+        """Return the data the sidebar editor works on.
+
+        :param scope: "default" (administrators only), "personal", or None to
+            let the server choose, see _resolve_sidebar_editor_scope().
+
+        Unlike get_sidebar_groups(), empty groups are included so that apps can
+        be dragged into a group that was just created. A user without a
+        personal arrangement starts from the shared default.
+        """
+        visible_roots = self._get_sidebar_visible_root_ids()
+        scope = self._resolve_sidebar_editor_scope(scope)
+        personal_layout = self._get_personal_layout_record()
+        if scope == "personal" and personal_layout:
+            editor_groups = self._clean_personal_groups(personal_layout.layout, visible_roots, keep_empty=True)
+        else:
+            editor_groups = self._get_shared_editor_groups(visible_roots)
+        return {
+            "editor_groups": editor_groups,
+            "config": self.get_sidebar_config(),
+            "scope": scope,
+            "has_personal_layout": bool(personal_layout),
+            "can_edit_default": self._is_sidebar_administrator(),
+        }
+
+    # ----- shared default (administrators) -----
 
     @api.model
     def _validate_sidebar_layout(self, groups, ungrouped_menu_ids):
-        """Check the shape of a layout sent by the browser.
+        """Check the shape of a default layout sent by the browser.
 
         :return: (list of (group record, ordered menu ids), list of ungrouped menu ids)
         """
@@ -196,7 +294,7 @@ class NavigationGroup(models.Model):
 
     @api.model
     def save_sidebar_layout(self, groups, ungrouped_menu_ids=None):
-        """Store the arrangement made by drag and drop in the sidebar.
+        """Store the shared default arrangement made by drag and drop.
 
         :param groups: groups in display order, each ``{"id": group id,
             "menu_ids": app ids in display order}``
@@ -227,6 +325,72 @@ class NavigationGroup(models.Model):
             item = item_by_menu_id.get(menu_id)
             if item and item.group_id:
                 item.group_id = False
+        return self.get_sidebar_editor_config("default")
+
+    # ----- personal arrangement (every internal user, own layout only) -----
+
+    @api.model
+    def _validate_personal_layout(self, groups, visible_roots):
+        """Check a personal layout sent by the browser and return what is stored.
+
+        A personal group lives only inside the layout: it has a number that is
+        unique within the layout, a name, an optional colour and symbol, and
+        the apps in display order. Only apps the user may open are accepted.
+        """
+        invalid = ValidationError(_("Die Anordnung der Navigation ist ungültig. Bitte die Seite neu laden."))
+        icon_keys = {key for key, _label in GROUP_ICONS}
+        if not isinstance(groups, list) or len(groups) > PERSONAL_LAYOUT_MAX_GROUPS:
+            raise invalid
+        cleaned, seen_group_ids, seen_menu_ids = [], set(), set()
+        for entry in groups:
+            if not isinstance(entry, dict):
+                raise invalid
+            group_id, name, menu_ids = entry.get("id"), entry.get("name"), entry.get("menu_ids")
+            color, icon = entry.get("color") or False, entry.get("icon") or False
+            if (
+                type(group_id) is not int or group_id <= 0 or group_id in seen_group_ids
+                or not isinstance(name, str) or not name.strip()
+                or len(name.strip()) > PERSONAL_GROUP_NAME_MAX_LENGTH
+                or not isinstance(menu_ids, list)
+                or (color and not (isinstance(color, str) and re.fullmatch(GROUP_COLOR_PATTERN, color)))
+                or (icon and icon not in icon_keys)
+            ):
+                raise invalid
+            seen_group_ids.add(group_id)
+            for menu_id in menu_ids:
+                if type(menu_id) is not int or menu_id in seen_menu_ids or menu_id not in visible_roots:
+                    raise invalid
+                seen_menu_ids.add(menu_id)
+            cleaned.append({
+                "id": group_id, "name": name.strip(), "color": color, "icon": icon, "menu_ids": list(menu_ids),
+            })
+        return cleaned
+
+    @api.model
+    def save_personal_sidebar_layout(self, groups):
+        """Store the calling user's own arrangement; nobody else is affected.
+
+        :param groups: every personal group in display order, each ``{"id",
+            "name", "color", "icon", "menu_ids"}``. Apps outside every group
+            simply appear without a group.
+        :return: the fresh editor data, see get_sidebar_editor_config()
+        """
+        visible_roots = self._get_sidebar_visible_root_ids()
+        cleaned_groups = self._validate_personal_layout(groups, visible_roots)
+        personal_layout = self._get_personal_layout_record()
+        if personal_layout:
+            personal_layout.layout = cleaned_groups
+        else:
+            self.env["algorithma.navigation.user.layout"].sudo().create({
+                "user_id": self.env.uid, "layout": cleaned_groups,
+            })
+        return self.get_sidebar_editor_config("personal")
+
+    @api.model
+    def reset_personal_sidebar_layout(self):
+        """Drop the calling user's own arrangement and show the default again."""
+        self._get_sidebar_visible_root_ids()
+        self._get_personal_layout_record().unlink()
         return self.get_sidebar_editor_config()
 
 
@@ -262,3 +426,25 @@ class NavigationItem(models.Model):
         for item in self:
             if item.menu_id.parent_id:
                 raise ValidationError(_("Es können nur Apps mit einem Hauptmenü zugeordnet werden, keine Untermenüs."))
+
+
+class NavigationUserLayout(models.Model):
+    """One personal sidebar arrangement per user.
+
+    The layout is a list of personal groups, see
+    NavigationGroup._validate_personal_layout(). It is only reached through
+    the methods of algorithma.navigation.group, which bind it to the caller.
+    """
+    _name = "algorithma.navigation.user.layout"
+    _description = "Persönliche App-Anordnung"
+    _rec_name = "user_id"
+
+    user_id = fields.Many2one(
+        "res.users", string="Benutzer", required=True, ondelete="cascade", index=True,
+    )
+    layout = fields.Json(string="Anordnung")
+
+    _user_unique = models.Constraint(
+        "UNIQUE(user_id)",
+        "Jeder Benutzer hat höchstens eine persönliche Anordnung.",
+    )
