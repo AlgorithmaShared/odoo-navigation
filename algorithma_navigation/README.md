@@ -47,6 +47,9 @@ What to know:
   stay hidden for everyone and do not appear in the editor.
 - A user with an own arrangement no longer follows later changes of the
   default. Newly installed apps appear under **Ohne Gruppe** for that user.
+- A user who starts from the default gets the default groups that hold at
+  least one app that user may open. Other default groups, empty ones
+  included, are shown to administrators only.
 - Changes to the default reach other users after reloading the web client.
 - The editor needs a pointer; with the keyboard, administrators use
   **App-Zuordnungen** for the default. On the 46-pixel rail, on medium screens
@@ -140,7 +143,7 @@ requires its own compatibility check.
 
 ## Validation
 
-Version `20.0.1.4.0` passed 39 native Odoo tests and 23 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
+Version `20.0.1.4.0` passed 40 native Odoo tests and 23 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
 
 Validated on Odoo **20.0-20261102**, PostgreSQL 16 and MuK AppsBar
 **20.0.1.2.8** with the full MuK theme. Version `20.0.1.2.0` passed nineteen

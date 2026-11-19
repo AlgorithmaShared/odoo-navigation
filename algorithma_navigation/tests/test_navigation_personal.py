@@ -2,6 +2,7 @@
 
 Covered here:
 - a user without an own arrangement starts from the shared default,
+- default groups without an app of the user stay unknown to that user,
 - an own arrangement replaces the default for its owner only,
 - saving twice keeps one row per user; resetting returns to the default,
 - apps an administrator hid stay hidden; apps a user lost later are dropped,
@@ -57,11 +58,16 @@ class TestNavigationPersonal(TransactionCase):
         cls.restricted_app = create_app("Personal Restricted App", 990, cls.restricted_role)
         cls.submenu = cls.app_a.copy({"name": "Personal Submenu", "parent_id": cls.app_a.id})
 
-        # ----- shared default: one group with two apps, one empty group -----
+        # ----- shared default: one group with two apps, one empty group, and one
+        #       group that only holds an app ordinary employees may not open -----
         cls.default_group = cls.Group.create({"name": "Personal Default", "sequence": 930, "color": "#2563EB"})
         cls.default_empty_group = cls.Group.create({"name": "Personal Default Empty", "sequence": 940})
+        cls.default_restricted_group = cls.Group.create({"name": "Personal Default Restricted", "sequence": 950})
         cls.item_a = cls.Item.create({"group_id": cls.default_group.id, "menu_id": cls.app_a.id, "sequence": 10})
         cls.item_b = cls.Item.create({"group_id": cls.default_group.id, "menu_id": cls.app_b.id, "sequence": 20})
+        cls.Item.create({
+            "group_id": cls.default_restricted_group.id, "menu_id": cls.restricted_app.id, "sequence": 10,
+        })
 
     # ----- helpers -----
 
@@ -90,9 +96,28 @@ class TestNavigationPersonal(TransactionCase):
         groups = {group["id"]: group for group in editor_config["editor_groups"]}
         self.assertEqual(groups[self.default_group.id]["menu_ids"], [self.app_a.id, self.app_b.id])
         self.assertEqual(groups[self.default_group.id]["color"], "#2563EB")
-        self.assertEqual(groups[self.default_empty_group.id]["menu_ids"], [])
         self.assertEqual(self._sidebar(self.alice)[self.default_group.id]["menu_ids"], [self.app_a.id, self.app_b.id])
         self.assertFalse(self.Layout.search([("user_id", "=", self.alice.id)]))
+
+    def test_default_groups_without_an_own_app_stay_unknown_to_ordinary_users(self):
+        unknown_groups = self.default_empty_group | self.default_restricted_group
+        for scope in (None, "personal"):
+            with self.subTest(user="alice", scope=scope):
+                editor_config = self._as(self.alice).get_sidebar_editor_config(scope)
+                editor_group_ids = [group["id"] for group in editor_config["editor_groups"]]
+                self.assertIn(self.default_group.id, editor_group_ids)
+                self.assertFalse(set(editor_group_ids) & set(unknown_groups.ids))
+                # Not even the names travel to the browser.
+                for unknown_group in unknown_groups:
+                    self.assertNotIn(unknown_group.name, str(editor_config))
+                # The editor starts from exactly the groups of the user's sidebar.
+                self.assertEqual(editor_group_ids, [group["id"] for group in editor_config["config"]["groups"]])
+        # Administrators arrange the default: they get every group, in both layers.
+        for scope in ("default", "personal"):
+            with self.subTest(user="admin", scope=scope):
+                editor_config = self._as(self.admin_user).get_sidebar_editor_config(scope)
+                editor_group_ids = {group["id"] for group in editor_config["editor_groups"]}
+                self.assertTrue(set(unknown_groups.ids) <= editor_group_ids)
 
     # ----- own arrangement -----
 
