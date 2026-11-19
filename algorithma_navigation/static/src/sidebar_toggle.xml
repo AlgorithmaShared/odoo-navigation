@@ -39,6 +39,17 @@
                         <path t-att-d="this.algorithmaSidebarControlState.collapsed ? 'm9 6 6 6-6 6' : 'm15 6-6 6 6 6'"/>
                     </svg>
                 </button>
+                <!-- Every user: switch the own sidebar into the drag and drop edit mode. -->
+                <button t-if="this.algorithmaCanEditNavigation" type="button"
+                        class="algorithma_nav_edit_toggle"
+                        t-att-class="{'active': this.algorithmaNavigationEditor.active}"
+                        t-att-title="this.algorithmaNavigationEditorLabel"
+                        t-att-aria-label="this.algorithmaNavigationEditorLabel"
+                        t-att-aria-pressed="this.algorithmaNavigationEditor.active ? 'true' : 'false'"
+                        t-on-click="this.algorithmaToggleNavigationEditor">
+                    <i t-att-class="this.algorithmaNavigationEditor.active ? 'fa fa-check' : 'fa fa-pencil'"
+                       aria-hidden="true"/>
+                </button>
             </li>
         </xpath>
         <xpath expr="//a[@t-att-data-menu-id]" position="attributes">

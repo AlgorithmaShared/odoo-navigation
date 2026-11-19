@@ -21,13 +21,14 @@
         height: auto;
     }
 
+    // Colours come from $algorithma-nav-* (see scss/primary_variables.scss), so
+    // text stays readable on a light and on a dark sidebar alike.
     .algorithma_nav_group_compact {
         align-items: center;
         background: transparent;
         border: 0;
         border-radius: 6px;
-        // The compact rail sits on MuK's configurable sidebar background.
-        color: $mk-appbar-color;
+        color: $algorithma-nav-icon;
         cursor: pointer;
         display: flex;
         height: 40px;
@@ -39,8 +40,7 @@
         &:hover,
         &.active,
         &[aria-expanded="true"] {
-            background: #DEE2E6;
-            color: #1F2937;
+            background: $algorithma-nav-neutral;
         }
 
         &:focus-visible {
@@ -72,15 +72,10 @@
 
         .algorithma_nav_group_header {
             align-items: center;
-            // Tint an opaque light surface rather than the native dark rail.
-            background-color: #DEE2E6;
-            background-image: linear-gradient(
-                var(--algorithma-group-tint, transparent),
-                var(--algorithma-group-tint, transparent)
-            );
+            background: var(--algorithma-group-tint, #{$algorithma-nav-neutral});
             border: 0;
             border-inline-start: 3px solid var(--algorithma-group-accent, transparent);
-            color: #1F2937;
+            color: $mk-appbar-color;
             cursor: pointer;
             display: flex;
             font-size: 12px;
@@ -91,11 +86,7 @@
             width: 100%;
 
             &:hover {
-                background-color: #D3D8DE;
-                background-image: linear-gradient(
-                    var(--algorithma-group-hover, transparent),
-                    var(--algorithma-group-hover, transparent)
-                );
+                background: var(--algorithma-group-hover, #{$algorithma-nav-neutral-hover});
             }
 
             &:focus-visible {
@@ -109,7 +100,7 @@
         }
 
         .algorithma_group_icon_svg {
-            color: var(--algorithma-group-accent, #5F6368);
+            color: var(--algorithma-group-accent, #{$algorithma-nav-icon});
         }
 
         .algorithma_nav_group_name {
@@ -121,20 +112,15 @@
 
         .algorithma_nav_group_apps {
             display: block;
-            background: #F8FAFC;
-
-            // MuK's text color belongs to its rail, not these light app rows.
-            > li > a {
-                color: #1F2937;
-            }
+            background: $algorithma-nav-apps-background;
 
             > li:not(.active):hover > a {
-                background: #E7EBEF;
+                background: $algorithma-nav-apps-hover;
             }
 
             > li.active > a {
-                background: #E1E5EA;
-                color: #1F2937;
+                background: $algorithma-nav-apps-active;
+                color: $mk-appbar-color;
             }
         }
 

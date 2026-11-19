@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Edit mode of the sidebar: groups and apps are arranged by drag and drop.
+         Rows are plain list items, not links, so a click never leaves the page. -->
+    <t t-name="algorithma_navigation.NavigationEditor">
+        <div class="algorithma_nav_editor" t-ref="root">
+            <!-- Administrators choose the layer: their own arrangement or the default for everyone. -->
+            <div t-if="state.canEditDefault" class="algorithma_nav_scope" role="group"
+                 aria-label="Edit the arrangement for">
+                <button type="button" class="algorithma_nav_scope_option"
+                        t-att-class="{'active': this.isPersonal}"
+                        t-att-aria-pressed="this.isPersonal ? 'true' : 'false'"
+                        t-on-click="() => this.switchScope('personal')">For me</button>
+                <button type="button" class="algorithma_nav_scope_option"
+                        t-att-class="{'active': !this.isPersonal}"
+                        t-att-aria-pressed="this.isPersonal ? 'false' : 'true'"
+                        t-on-click="() => this.switchScope('default')">For everyone</button>
+            </div>
+            <p class="algorithma_nav_editor_hint" t-out="this.hintText"/>
+            <button t-if="this.isPersonal and state.hasPersonalLayout" type="button"
+                    class="algorithma_nav_reset" t-on-click="this.resetPersonalLayout">
+                Reset to default
+            </button>
+
+            <div class="algorithma_nav_edit_groups">
+                <section t-foreach="state.sections" t-as="section" t-key="section.key"
+                         class="algorithma_nav_edit_group"
+                         t-att-data-group-id="section.id" t-att-style="section.style">
+                    <div class="algorithma_nav_edit_header">
+                        <span class="algorithma_nav_edit_grip" title="Move group" aria-hidden="true">
+                            <i class="oi oi-draggable"/>
+                        </span>
+                        <input t-if="state.renamingGroupId === section.id" t-ref="renameInput"
+                               type="text" class="algorithma_nav_edit_name_input"
+                               aria-label="Name of the group" maxlength="60"
+                               t-model="state.renameValue"
+                               t-on-keydown="this.onRenameKeydown" t-on-blur="this.commitRename"/>
+                        <t t-else="">
+                            <t t-if="section.icon" t-call="algorithma_navigation.GroupIcon">
+                                <t t-set="groupIcon" t-value="section.icon"/>
+                            </t>
+                            <span class="algorithma_nav_edit_name" t-att-title="section.name"
+                                  t-on-dblclick="() => this.startRename(section.id)" t-out="section.name"/>
+                        </t>
+                        <span class="algorithma_nav_edit_actions">
+                        <button type="button" class="algorithma_nav_edit_action"
+                                title="Rename group" aria-label="Rename group"
+                                t-on-click="() => this.startRename(section.id)">
+                            <i class="fa fa-pencil" aria-hidden="true"/>
+                        </button>
+                        <button type="button" class="algorithma_nav_edit_action"
+                                title="Color and symbol" aria-label="Color and symbol"
+                                t-att-aria-expanded="state.stylingGroupId === section.id ? 'true' : 'false'"
+                                t-on-click="() => this.toggleStylePanel(section)">
+                            <i class="fa fa-paint-brush" aria-hidden="true"/>
+                        </button>
+                        <button type="button" class="algorithma_nav_edit_action"
+                                title="Delete group" aria-label="Delete group"
+                                t-on-click="() => this.deleteGroup(section)">
+                            <i class="fa fa-trash-o" aria-hidden="true"/>
+                        </button>
+                        </span>
+                    </div>
+
+                    <!-- Colour and symbol of the group, chosen in place. -->
+                    <div t-if="state.stylingGroupId === section.id" class="algorithma_nav_style_panel">
+                        <div class="algorithma_nav_style_row" role="group" aria-label="Color of the group">
+                            <button t-foreach="this.colorPresets" t-as="color" t-key="color" type="button"
+                                    class="algorithma_nav_style_color"
+                                    t-att-style="'background-color:' + color"
+                                    t-att-title="color" t-att-aria-label="color"
+                                    t-att-aria-pressed="section.color === color ? 'true' : 'false'"
+                                    t-on-click="() => this.setGroupStyle(section, { color })"/>
+                            <button type="button" class="algorithma_nav_style_none"
+                                    title="No color" aria-label="No color"
+                                    t-att-aria-pressed="section.color ? 'false' : 'true'"
+                                    t-on-click="() => this.setGroupStyle(section, { color: false })">×</button>
+                        </div>
+                        <div class="algorithma_nav_style_row" role="group" aria-label="Symbol of the group">
+                            <button t-foreach="this.iconChoices" t-as="choice" t-key="choice.key" type="button"
+                                    class="algorithma_nav_style_icon"
+                                    t-att-title="choice.label" t-att-aria-label="choice.label"
+                                    t-att-aria-pressed="section.icon === choice.key ? 'true' : 'false'"
+                                    t-on-click="() => this.setGroupStyle(section, { icon: choice.key })">
+                                <t t-call="algorithma_navigation.GroupIcon">
+                                    <t t-set="groupIcon" t-value="choice.key"/>
+                                </t>
+                            </button>
+                            <button type="button" class="algorithma_nav_style_none"
+                                    title="No symbol" aria-label="No symbol"
+                                    t-att-aria-pressed="section.icon ? 'false' : 'true'"
+                                    t-on-click="() => this.setGroupStyle(section, { icon: false })">×</button>
+                        </div>
+                    </div>
+
+                    <ul class="algorithma_nav_dropzone" t-att-data-group-id="section.id"
+                        t-att-aria-label="section.name">
+                        <li t-foreach="section.apps" t-as="app" t-key="app.id"
+                            class="algorithma_nav_edit_app" t-att-data-menu-id="app.id">
+                            <t t-call="algorithma_navigation.NavigationEditorApp"/>
+                        </li>
+                        <li t-if="!section.apps.length" class="algorithma_nav_drop_hint">
+                            Drag apps here
+                        </li>
+                    </ul>
+                </section>
+            </div>
+
+            <button type="button" class="algorithma_nav_add_group" t-on-click="this.addGroup">
+                <i class="fa fa-plus" aria-hidden="true"/>
+                <span>New group</span>
+            </button>
+
+            <div class="algorithma_nav_edit_ungrouped">
+                <div class="algorithma_nav_edit_ungrouped_title">Without group</div>
+                <ul class="algorithma_nav_dropzone" aria-label="Without group">
+                    <li t-foreach="state.ungrouped" t-as="app" t-key="app.id"
+                        class="algorithma_nav_edit_app" t-att-data-menu-id="app.id">
+                        <t t-call="algorithma_navigation.NavigationEditorApp"/>
+                    </li>
+                    <li t-if="!state.ungrouped.length" class="algorithma_nav_drop_hint">
+                        Drag apps here to take them out of their group
+                    </li>
+                </ul>
+            </div>
+
+            <button type="button" class="algorithma_nav_editor_done" t-on-click="props.onClose">
+                <i class="fa fa-check" aria-hidden="true"/>
+                <span>Done arranging</span>
+            </button>
+        </div>
+    </t>
+
+    <!-- One draggable app row: the native app icon and name, as in the MuK sidebar. -->
+    <t t-name="algorithma_navigation.NavigationEditorApp">
+        <img t-if="app.webIconData" class="mk_apps_sidebar_icon" alt="" draggable="false"
+             t-att-src="app.webIconData"/>
+        <img t-else="" class="mk_apps_sidebar_icon" alt="" draggable="false"
+             src="/base/static/description/icon.png"/>
+        <span class="algorithma_nav_edit_app_name" t-out="app.label"/>
+    </t>
+
+    <!-- The editor takes the place of the normal list while it is open. -->
+    <t t-name="algorithma_navigation.NavigationEditorHost"
+       t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]" position="before">
+            <li t-if="this.algorithmaNavigationEditor.active" class="algorithma_nav_editor_host">
+                <NavigationEditor apps="this.algorithmaNavigationApps"
+                                  onConfigChanged.bind="algorithmaApplyNavigationConfig"
+                                  onClose.bind="algorithmaToggleNavigationEditor"/>
+            </li>
+        </xpath>
+    </t>
+</templates>
