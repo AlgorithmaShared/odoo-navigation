@@ -1,0 +1,54 @@
+// =============================================================================
+// Algorithma navigation: default sidebar colours and derived surface colours
+//
+// Loaded in web._assets_primary_variables right after MuK's AppsBar variables,
+// so every stylesheet of this module can rely on the values below.
+//
+// 1. DEFAULT PALETTE  A light sidebar is the default look of this module. It
+//                     replaces MuK's stock dark colours only. Colours chosen in
+//                     the MuK theme settings always win.
+// 2. SURFACES         Colours of group headers, app lists and rail icons,
+//                     picked to stay readable on a light and on a dark sidebar.
+// =============================================================================
+
+// ===== 1. DEFAULT PALETTE =====
+
+// Set to false (in an earlier primary-variables file) to keep MuK's stock colours.
+$algorithma-nav-default-palette: true !default;
+$algorithma-nav-default-background: #D9DDE2 !default;
+$algorithma-nav-default-text: #272C31 !default;
+$algorithma-nav-default-active: #BCCDF0 !default;
+
+// MuK's stock sidebar colours on Odoo 20: AppsBar on its own, or with the MuK
+// theme installed. Anything else was chosen by an administrator.
+$algorithma-nav-stock-appsbar: $mk-appbar-background == #25262b and $mk-appbar-color == #d1d1d3;
+$algorithma-nav-stock-theme: $mk-appbar-background == #111827 and $mk-appbar-color == #dee2e6;
+$algorithma-nav-muk-stock-active: #5d8da8;
+
+@if $algorithma-nav-default-palette and ($algorithma-nav-stock-appsbar or $algorithma-nav-stock-theme) {
+    // The stock highlight is MuK's theme blue or, without the theme, Odoo's brand colour.
+    @if $mk-appbar-active == $algorithma-nav-muk-stock-active or $mk-appbar-active == $o-brand-primary {
+        $mk-appbar-active: $algorithma-nav-default-active !global;
+    }
+    $mk-appbar-background: $algorithma-nav-default-background !global;
+    $mk-appbar-color: $algorithma-nav-default-text !global;
+    // MuK 20 draws hover and border as white veils, which vanish on a light sidebar.
+    $mk-appbar-hover: rgba($algorithma-nav-default-text, .08) !global;
+    $mk-appbar-border: rgba($algorithma-nav-default-text, .12) !global;
+}
+
+// ===== 2. SURFACES =====
+
+// On a light sidebar the groups use the light greys this module was designed
+// with. On a dark sidebar the same places use tints of the sidebar text colour.
+$algorithma-nav-light-sidebar: lightness($mk-appbar-background) > 55%;
+
+// Rail icons and group symbols without their own colour.
+$algorithma-nav-icon: if($algorithma-nav-light-sidebar, #5F6368, rgba($mk-appbar-color, .85));
+// Group header without its own colour, hovered or active rail icon.
+$algorithma-nav-neutral: if($algorithma-nav-light-sidebar, #DEE2E6, rgba($mk-appbar-color, .10));
+$algorithma-nav-neutral-hover: if($algorithma-nav-light-sidebar, #D3D8DE, rgba($mk-appbar-color, .18));
+// App list inside an expanded group.
+$algorithma-nav-apps-background: if($algorithma-nav-light-sidebar, #F8FAFC, rgba($mk-appbar-color, .04));
+$algorithma-nav-apps-hover: if($algorithma-nav-light-sidebar, #E7EBEF, rgba($mk-appbar-color, .12));
+$algorithma-nav-apps-active: if($algorithma-nav-light-sidebar, #E1E5EA, $mk-appbar-active);
