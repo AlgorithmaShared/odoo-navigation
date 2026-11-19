@@ -3,7 +3,7 @@
     <t t-name="algorithma_navigation.AppsBar"
        t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
         <xpath expr="//div[hasclass('mk_apps_sidebar_panel')]" position="attributes">
-            <attribute name="t-att-class">{'algorithma_nav_grouped': this.algorithmaNavigationGroups.length > 0}</attribute>
+            <attribute name="t-att-class">{'algorithma_nav_grouped': this.algorithmaNavigationGroups.length > 0, 'algorithma_nav_editing': this.algorithmaNavigationEditor.active}</attribute>
         </xpath>
         <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]" position="attributes">
             <attribute name="t-foreach">this.algorithmaNavigationStandaloneApps</attribute>

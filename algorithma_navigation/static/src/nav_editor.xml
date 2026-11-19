@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Edit mode of the sidebar: groups and apps are arranged by drag and drop.
+         Rows are plain list items, not links, so a click never leaves the page.
+         OWL 3: component members need `this.`, t-call passes variables as attributes. -->
+    <t t-name="algorithma_navigation.NavigationEditor">
+        <div class="algorithma_nav_editor" t-ref="this.rootRef">
+            <p class="algorithma_nav_editor_hint">
+                Apps und Gruppen mit der Maus verschieben. Die Anordnung gilt für alle Benutzer.
+            </p>
+
+            <div class="algorithma_nav_edit_groups">
+                <section t-foreach="this.state.sections" t-as="section" t-key="section.key"
+                         class="algorithma_nav_edit_group"
+                         t-att-data-group-id="section.id" t-att-style="section.style">
+                    <div class="algorithma_nav_edit_header">
+                        <span class="algorithma_nav_edit_grip" title="Gruppe verschieben" aria-hidden="true">
+                            <i class="oi oi-draggable"/>
+                        </span>
+                        <input t-if="this.state.renamingGroupId === section.id"
+                               type="text" class="algorithma_nav_edit_name_input"
+                               aria-label="Name der Gruppe" maxlength="60"
+                               t-att-value="this.state.renameValue"
+                               t-on-input="this.onRenameInput"
+                               t-on-keydown="this.onRenameKeydown" t-on-blur="this.commitRename"/>
+                        <t t-else="">
+                            <t t-if="section.icon" t-call="algorithma_navigation.GroupIcon"
+                               groupIcon="section.icon"/>
+                            <span class="algorithma_nav_edit_name" t-att-title="section.name"
+                                  t-on-dblclick="() => this.startRename(section.id)" t-out="section.name"/>
+                        </t>
+                        <span class="algorithma_nav_edit_actions">
+                        <button type="button" class="algorithma_nav_edit_action"
+                                title="Gruppe umbenennen" aria-label="Gruppe umbenennen"
+                                t-on-click="() => this.startRename(section.id)">
+                            <i class="fa fa-pencil" aria-hidden="true"/>
+                        </button>
+                        <button type="button" class="algorithma_nav_edit_action"
+                                title="Farbe und Symbol" aria-label="Farbe und Symbol"
+                                t-on-click="() => this.openGroupStyle(section)">
+                            <i class="fa fa-paint-brush" aria-hidden="true"/>
+                        </button>
+                        <button type="button" class="algorithma_nav_edit_action"
+                                title="Gruppe löschen" aria-label="Gruppe löschen"
+                                t-on-click="() => this.deleteGroup(section)">
+                            <i class="fa fa-trash-o" aria-hidden="true"/>
+                        </button>
+                        </span>
+                    </div>
+                    <ul class="algorithma_nav_dropzone" t-att-data-group-id="section.id"
+                        t-att-aria-label="section.name">
+                        <li t-foreach="section.apps" t-as="app" t-key="app.id"
+                            class="algorithma_nav_edit_app" t-att-data-menu-id="app.id">
+                            <t t-call="algorithma_navigation.NavigationEditorApp" app="app"/>
+                        </li>
+                        <li t-if="!section.apps.length" class="algorithma_nav_drop_hint">
+                            Apps hierher ziehen
+                        </li>
+                    </ul>
+                </section>
+            </div>
+
+            <button type="button" class="algorithma_nav_add_group" t-on-click="this.addGroup">
+                <i class="fa fa-plus" aria-hidden="true"/>
+                <span>Neue Gruppe</span>
+            </button>
+
+            <div class="algorithma_nav_edit_ungrouped">
+                <div class="algorithma_nav_edit_ungrouped_title">Ohne Gruppe</div>
+                <ul class="algorithma_nav_dropzone" aria-label="Ohne Gruppe">
+                    <li t-foreach="this.state.ungrouped" t-as="app" t-key="app.id"
+                        class="algorithma_nav_edit_app" t-att-data-menu-id="app.id">
+                        <t t-call="algorithma_navigation.NavigationEditorApp" app="app"/>
+                    </li>
+                    <li t-if="!this.state.ungrouped.length" class="algorithma_nav_drop_hint">
+                        Apps hierher ziehen, um sie aus der Gruppe zu lösen
+                    </li>
+                </ul>
+            </div>
+
+            <button type="button" class="algorithma_nav_editor_done" t-on-click="this.props.onClose">
+                <i class="fa fa-check" aria-hidden="true"/>
+                <span>Fertig</span>
+            </button>
+        </div>
+    </t>
+
+    <!-- One draggable app row: the native app icon and name, as in the MuK sidebar. -->
+    <t t-name="algorithma_navigation.NavigationEditorApp">
+        <img class="mk_apps_sidebar_icon" alt="" draggable="false"
+             t-att-src="app.webIconData || '/base/static/description/icon.png'"/>
+        <span class="algorithma_nav_edit_app_name" t-out="app.label"/>
+    </t>
+
+    <!-- The editor takes the place of the normal list while it is open. -->
+    <t t-name="algorithma_navigation.NavigationEditorHost"
+       t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]/t[@t-foreach]" position="before">
+            <li t-if="this.algorithmaNavigationEditor.active" class="algorithma_nav_editor_host">
+                <NavigationEditor apps="this.algorithmaNavigationApps"
+                                  onConfigChanged.bind="this.algorithmaApplyNavigationConfig"
+                                  onClose.bind="this.algorithmaToggleNavigationEditor"/>
+            </li>
+        </xpath>
+    </t>
+</templates>
