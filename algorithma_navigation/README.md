@@ -13,17 +13,17 @@ in the compact rail. The half-size, centered sidebar logo is retained.
 ## Arranging the navigation by drag and drop
 
 Version `20.0.1.4.0` adds an edit mode to the wide sidebar. Every internal user
-may use it while **Apps gruppieren** is switched on.
+may use it while **Group apps** is switched on.
 
 - Click the **pencil** next to **Navigation**. The sidebar shows every group,
-  empty ones included, and a box **Ohne Gruppe** for apps without a group.
-- **Drag an app** onto another position, into another group, or into **Ohne
-  Gruppe**. Apps without a group keep their native MuK order.
+  empty ones included, and a box **Without group** for apps without a group.
+- **Drag an app** onto another position, into another group, or into **Without
+  group**. Apps without a group keep their native MuK order.
 - **Drag a group** by its grip to change the order of the groups.
-- **Neue Gruppe** creates a group and lets you type its name at once. The
+- **New group** creates a group and lets you type its name at once. The
   buttons in a group header rename it, choose its colour and symbol, or delete
   it. Deleting a group keeps its apps; they appear without a group.
-- Every change is stored immediately. **Fertig** or the check mark leaves the
+- Every change is stored immediately. **Done arranging** or the check mark leaves the
   edit mode.
 
 ### An own arrangement per user, and a default for everyone
@@ -33,26 +33,26 @@ Two layers exist:
 - **Own arrangement.** Each user arranges the own sidebar. It is stored per
   user on the server, so it follows the user to every device, and it replaces
   the default for that user only. A user without an own arrangement starts
-  from the default; the first change creates the own one. **Auf Standard
-  zurücksetzen** drops it again.
+  from the default; the first change creates the own one. **Reset to
+  default** drops it again.
 - **Default.** The arrangement for everyone without an own one. Only settings
-  administrators may change it. In the editor they switch between **Für mich**
-  and **Für alle**. An administrator without an own arrangement edits the
+  administrators may change it. In the editor they switch between **For me**
+  and **For everyone**. An administrator without an own arrangement edits the
   default, as before.
 
 What to know:
 
 - Access rights are untouched: a user only ever sees and arranges apps that
-  user may open. Apps an administrator hid with **In Seitenleiste ausblenden**
+  user may open. Apps an administrator hid with **Hide in sidebar**
   stay hidden for everyone and do not appear in the editor.
 - A user with an own arrangement no longer follows later changes of the
-  default. Newly installed apps appear under **Ohne Gruppe** for that user.
+  default. Newly installed apps appear under **Without group** for that user.
 - A user who starts from the default gets the default groups that hold at
   least one app that user may open. Other default groups, empty ones
   included, are shown to administrators only.
 - Changes to the default reach other users after reloading the web client.
 - The editor needs a pointer; with the keyboard, administrators use
-  **App-Zuordnungen** for the default. On the 46-pixel rail, on medium screens
+  **App Assignments** for the default. On the 46-pixel rail, on medium screens
   and on phones the pencil is not shown.
 
 Server methods behind the editor, all on `algorithma.navigation.group`:
@@ -69,6 +69,14 @@ Server methods behind the editor, all on `algorithma.navigation.group`:
 
 The same version declares the `close` property of the group flyout, which Odoo
 passes to every popover; without it the flyout raised an error in developer mode.
+
+## Languages
+
+The texts are English in the code. A German translation ships in `i18n/de.po`
+(template: `i18n/algorithma_navigation.pot`), so the interface, the names of the
+default groups and the messages follow the language of each user. The names of
+own groups stay as the user typed them. Further languages are added as further
+`.po` files.
 
 ## Sidebar colours
 
@@ -89,15 +97,15 @@ by an earlier primary-variables file (`$algorithma-nav-default-background`,
 
 ## Configuration
 
-Use **Settings → General Settings → Navigation → Apps gruppieren** to enable or
+Use **Settings → General Settings → Navigation → Group apps** to enable or
 disable grouping for all users of this database. Saving an unchecked setting
 persists across reloads. Disabling grouping shows visible apps in native MuK
 order; existing group assignments and hidden-app choices remain stored.
 
-Use **Settings → Navigation → App-Zuordnungen** to assign an app to a group,
+Use **Settings → Navigation → App Assignments** to assign an app to a group,
 clear its group to show it directly, or hide it from the sidebar. Applications
 without an assignment and apps in archived or deleted groups also appear
-directly after the active groups. There is no automatic **Weitere Apps** section.
+directly after the active groups. There is no automatic catch-all section.
 Deleting a group leaves its app rows and hiding choices intact. Configured
 ordering applies within groups; direct apps retain native MuK order.
 
@@ -143,7 +151,7 @@ requires its own compatibility check.
 
 ## Validation
 
-Version `20.0.1.4.0` passed 40 native Odoo tests and 23 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
+Version `20.0.1.4.0` passed 40 native Odoo tests and 23 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by a script with real pointer events in Chromium (mouse, and emulated touch at tablet width) and in Firefox 160, with an administrator in English and an ordinary user in German. That script is not part of this repository; Safari and real touch devices were not tested.
 
 Validated on Odoo **20.0-20261102**, PostgreSQL 16 and MuK AppsBar
 **20.0.1.2.8** with the full MuK theme. Version `20.0.1.2.0` passed nineteen
@@ -193,10 +201,10 @@ assignments are preserved. User-created groups are not restyled.
 
 ## Hiding apps from the sidebar
 
-An administrator can select **In Seitenleiste ausblenden** on each assigned app
+An administrator can select **Hide in sidebar** on each assigned app
 under **Settings → Navigation → App Groups**. This hides the app from the sidebar
 for all users while preserving native app permissions, menus, actions and other
-access paths. An ungrouped app can be managed directly in **App-Zuordnungen**;
+access paths. An ungrouped app can be managed directly in **App Assignments**;
 its group is optional. Hiding remains effective with grouping switched off and
 when a group is archived, deleted or cleared. Clearing the checkbox or deleting
 the assignment shows the permitted app again after reloading the web client.

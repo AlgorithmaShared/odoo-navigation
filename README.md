@@ -19,16 +19,17 @@ This branch contains **Odoo 20 only**. Check out the matching branch for your se
 - Editable app groups with optional colors and twelve bundled symbols.
 - **Arrange directly in the sidebar:** click the pencil next to **Navigation** and drag apps into groups, between groups or out of every group, drag groups to reorder them, and create, rename, colour or delete groups on the spot.
 - **An own arrangement for every user:** each user arranges the own sidebar; it is stored per user and replaces the default for that user only. Administrators also keep the default for everyone without an own arrangement.
-- Central **Apps gruppieren** setting to switch grouping on or off without deleting assignments.
+- Central **Group apps** setting to switch grouping on or off without deleting assignments.
 - A light sidebar as the default look. Colours chosen in the MuK theme settings still win, and groups stay readable on a dark sidebar too.
 - Apps with an empty group appear directly after the groups, without a catch-all group.
 - A compact 46-pixel rail with group hover/click/keyboard flyouts and separate icons for ungrouped apps.
 - Administrators can hide individual sidebar apps for all users. This changes presentation, not access permissions.
 - Group collapse and sidebar width are remembered per browser, user and database.
+- English texts with a German translation; the interface follows the language of the user.
 
 ## Screenshots
 
-Taken on Odoo 20.0 with MuK AppsBar 20.0.1.2.8 and the MuK theme, on a database without demo data. The texts of this addon are German.
+Taken on Odoo 20.0 with MuK AppsBar 20.0.1.2.8 and the MuK theme, on a database without demo data. The pictures show the English texts; the one of the own arrangement shows the German translation.
 
 <table>
   <tr valign="top">
@@ -51,7 +52,7 @@ Taken on Odoo 20.0 with MuK AppsBar 20.0.1.2.8 and the MuK theme, on a database 
   <tr valign="top">
     <td width="33%">
       <b>Own arrangement of a user</b><br>
-      Every user keeps an own arrangement with own groups and can go back to the default.<br><br>
+      Every user keeps an own arrangement with own groups and can go back to the default. Shown in German.<br><br>
       <img src="docs/screenshots/06-own-arrangement.png" width="220" alt="Editor of an ordinary user with an own group and the link back to the default">
     </td>
     <td width="33%">
@@ -73,16 +74,16 @@ No MuK source files need to be edited.
 
 ## Configuration
 
-- **Settings → General Settings → Navigation → Apps gruppieren** controls grouping for the entire database.
-- **Settings → Navigation → App-Gruppen** manages groups and their styles.
-- **Settings → Navigation → App-Zuordnungen** assigns apps, leaves individual apps ungrouped, or hides them from the sidebar.
-- The **pencil** next to **Navigation** in the wide sidebar opens the drag and drop editor. Every user edits the own arrangement there; administrators switch between **Für mich** and **Für alle** (the default). Every change is saved at once.
+- **Settings → General Settings → Navigation → Group apps** controls grouping for the entire database.
+- **Settings → Navigation → App Groups** manages groups and their styles.
+- **Settings → Navigation → App Assignments** assigns apps, leaves individual apps ungrouped, or hides them from the sidebar.
+- The **pencil** next to **Navigation** in the wide sidebar opens the drag and drop editor. Every user edits the own arrangement there; administrators switch between **For me** and **For everyone** (the default). Every change is saved at once.
 
 Changes made in the drag and drop editor show at once for the person who made them; changes to the default reach other users after reloading. Save and reload the web client after changes in the settings lists. Existing assignments and hidden-app choices survive switching grouping off and on. Original app permissions still apply.
 
 ## Validation
 
-Version `20.0.1.4.0` passed 40 native Odoo tests and 23 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by hand in a browser; this repository contains no automated browser test for them.
+Version `20.0.1.4.0` passed 40 native Odoo tests and 23 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming, colouring and deletion, the own arrangement of an administrator and of an ordinary user, and resetting to the default were exercised by a script with real pointer events in Chromium (mouse, and emulated touch at tablet width) and in Firefox 160, with an administrator in English and an ordinary user in German. That script is not part of this repository; Safari and real touch devices were not tested.
 
 For version `1.3.0`: The Odoo 18, 19 and 20 variants each passed 25 native navigation tests. Isolated Chromium validation covered eight workflows on Odoo 18, twelve on Odoo 19 and eight on Odoo 20. Odoo 20 also passed two native web tests. The workflows cover the settings save/reload cycle, direct ungrouped apps, group flyouts, central hiding and ordinary-user permissions. Odoo 19 additionally includes rendered contrast checks for neutral and colored group headers, app rows and compact icons.
 
