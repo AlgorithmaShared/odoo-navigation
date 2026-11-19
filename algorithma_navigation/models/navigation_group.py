@@ -12,10 +12,10 @@ PERSONAL_GROUP_NAME_MAX_LENGTH = 100
 
 
 GROUP_ICONS = [
-    ("home", "Haus"), ("briefcase", "Aktentasche"), ("folder", "Ordner"),
-    ("receipt", "Beleg"), ("users", "Personen"), ("settings", "Einstellungen"),
-    ("calendar", "Kalender"), ("building", "Gebäude"), ("chart", "Diagramm"),
-    ("truck", "Fahrzeug"), ("star", "Stern"), ("heart", "Herz"),
+    ("home", "Home"), ("briefcase", "Briefcase"), ("folder", "Folder"),
+    ("receipt", "Receipt"), ("users", "People"), ("settings", "Settings"),
+    ("calendar", "Calendar"), ("building", "Building"), ("chart", "Chart"),
+    ("truck", "Vehicle"), ("star", "Star"), ("heart", "Heart"),
 ]
 
 DEFAULT_GROUP_STYLES = (
@@ -30,14 +30,14 @@ DEFAULT_GROUP_STYLES = (
 
 class NavigationGroup(models.Model):
     _name = "algorithma.navigation.group"
-    _description = "App-Gruppe"
+    _description = "App Group"
     _order = "sequence, id"
 
     name = fields.Char(string="Name", required=True, translate=True)
-    sequence = fields.Integer(string="Reihenfolge", default=10)
-    active = fields.Boolean(string="Aktiv", default=True)
-    color = fields.Char(string="Farbe", help="Optionale Farbe im Format #RRGGBB.")
-    icon = fields.Selection(GROUP_ICONS, string="Gruppensymbol")
+    sequence = fields.Integer(string="Sequence", default=10)
+    active = fields.Boolean(string="Active", default=True)
+    color = fields.Char(string="Color", help="Optional color in the format #RRGGBB.")
+    icon = fields.Selection(GROUP_ICONS, string="Group symbol")
     item_ids = fields.One2many(
         "algorithma.navigation.item", "group_id", string="Apps", copy=False,
     )
@@ -46,13 +46,13 @@ class NavigationGroup(models.Model):
     def _check_name(self):
         for group in self:
             if not (group.name or "").strip():
-                raise ValidationError(_("Eine App-Gruppe benötigt einen Namen."))
+                raise ValidationError(_("An app group needs a name."))
 
     @api.constrains("color")
     def _check_color(self):
         for group in self:
             if group.color and not re.fullmatch(GROUP_COLOR_PATTERN, group.color):
-                raise ValidationError(_("Bitte eine Farbe im Format #RRGGBB angeben, zum Beispiel #2563EB."))
+                raise ValidationError(_("Please enter a color in the format #RRGGBB, for example #2563EB."))
 
     @api.model
     def _fill_default_group_styles(self):
@@ -77,7 +77,7 @@ class NavigationGroup(models.Model):
         """Evaluate native menu permissions before reading configuration."""
 
         if not self.env.su and not self.env.user.has_group("base.group_user"):
-            raise AccessError(_("Die App-Navigation ist nur für interne Benutzer verfügbar."))
+            raise AccessError(_("The app navigation is only available to internal users."))
         menu_model = self.env["ir.ui.menu"].with_context(
             **{"ir.ui.menu.full_list": False, "active_test": True}
         )
@@ -147,7 +147,7 @@ class NavigationGroup(models.Model):
     def _check_sidebar_editor_access(self):
         """Refuse everyone except settings administrators (shared default)."""
         if not self._is_sidebar_administrator():
-            raise AccessError(_("Nur Administratoren können die Navigation für alle anordnen."))
+            raise AccessError(_("Only administrators can arrange the navigation for everyone."))
 
     @api.model
     def _get_personal_layout_record(self):
@@ -222,7 +222,7 @@ class NavigationGroup(models.Model):
         if scope == "personal":
             return "personal"
         if scope not in (None, False):
-            raise ValidationError(_("Unbekannter Bereich für die Navigation."))
+            raise ValidationError(_("Unknown layer of the navigation."))
         # No wish given: an administrator without a personal arrangement keeps
         # editing the shared default, everyone else their own arrangement.
         if self._is_sidebar_administrator() and not self._get_personal_layout_record():
@@ -256,6 +256,8 @@ class NavigationGroup(models.Model):
             "scope": scope,
             "has_personal_layout": bool(personal_layout),
             "can_edit_default": self._is_sidebar_administrator(),
+            # Names of the group symbols in the language of the user.
+            "icon_labels": dict(self._fields["icon"]._description_selection(self.env)),
         }
 
     # ----- shared default (administrators) -----
@@ -270,7 +272,7 @@ class NavigationGroup(models.Model):
             # bool is a subclass of int in Python; it is never a valid record id.
             return type(value) is int and value > 0
 
-        invalid = ValidationError(_("Die Anordnung der Navigation ist ungültig. Bitte die Seite neu laden."))
+        invalid = ValidationError(_("The arrangement of the navigation is invalid. Please reload the page."))
         if not isinstance(groups, list) or not isinstance(ungrouped_menu_ids, list):
             raise invalid
         group_ids, grouped_menu_ids = [], []
@@ -296,7 +298,7 @@ class NavigationGroup(models.Model):
         if len(group_records) != len(group_ids) or len(menus) != len(all_menu_ids):
             raise invalid
         if any(menu.parent_id for menu in menus):
-            raise ValidationError(_("Es können nur Apps mit einem Hauptmenü zugeordnet werden, keine Untermenüs."))
+            raise ValidationError(_("Only apps with a main menu can be assigned, not submenus."))
         layout = [(self.browse(entry["id"]), entry["menu_ids"]) for entry in groups]
         return layout, ungrouped_menu_ids
 
@@ -345,7 +347,7 @@ class NavigationGroup(models.Model):
         unique within the layout, a name, an optional colour and symbol, and
         the apps in display order. Only apps the user may open are accepted.
         """
-        invalid = ValidationError(_("Die Anordnung der Navigation ist ungültig. Bitte die Seite neu laden."))
+        invalid = ValidationError(_("The arrangement of the navigation is invalid. Please reload the page."))
         icon_keys = {key for key, _label in GROUP_ICONS}
         if not isinstance(groups, list) or len(groups) > PERSONAL_LAYOUT_MAX_GROUPS:
             raise invalid
@@ -404,36 +406,36 @@ class NavigationGroup(models.Model):
 
 class NavigationItem(models.Model):
     _name = "algorithma.navigation.item"
-    _description = "App-Zuordnung"
+    _description = "App Assignment"
     _order = "sequence, id"
     _rec_name = "menu_id"
 
     group_id = fields.Many2one(
-        "algorithma.navigation.group", string="Gruppe", ondelete="set null", index=True,
-        help="Ohne Gruppe erscheint die App direkt in der Seitenleiste. "
-             "Das Ausblenden bleibt unabhängig von der Gruppenzuordnung erhalten.",
+        "algorithma.navigation.group", string="Group", ondelete="set null", index=True,
+        help="Without a group the app appears directly in the sidebar. "
+             "Hiding stays in place whatever the group assignment is.",
     )
     menu_id = fields.Many2one(
         "ir.ui.menu", string="App", required=True, ondelete="cascade", index=True,
         domain=[("parent_id", "=", False)],
     )
-    sequence = fields.Integer(string="Reihenfolge", default=10)
+    sequence = fields.Integer(string="Sequence", default=10)
     hidden = fields.Boolean(
-        string="In Seitenleiste ausblenden", default=False,
-        help="Blendet diese App für alle Benutzer aus der Seitenleiste aus. "
-             "Ihre App-Berechtigungen und andere Zugriffswege bleiben erhalten.",
+        string="Hide in sidebar", default=False,
+        help="Hides this app from the sidebar for all users. "
+             "Its app permissions and other ways to reach it stay as they are.",
     )
 
     _menu_unique = models.Constraint(
         "UNIQUE(menu_id)",
-        "Eine App kann nur einer Gruppe zugeordnet werden. Entfernen Sie zuerst die bestehende Zuordnung.",
+        "An app can only be assigned to one group. Remove the existing assignment first.",
     )
 
     @api.constrains("menu_id")
     def _check_root_menu(self):
         for item in self:
             if item.menu_id.parent_id:
-                raise ValidationError(_("Es können nur Apps mit einem Hauptmenü zugeordnet werden, keine Untermenüs."))
+                raise ValidationError(_("Only apps with a main menu can be assigned, not submenus."))
 
 
 class NavigationUserLayout(models.Model):
@@ -444,15 +446,15 @@ class NavigationUserLayout(models.Model):
     the methods of algorithma.navigation.group, which bind it to the caller.
     """
     _name = "algorithma.navigation.user.layout"
-    _description = "Persönliche App-Anordnung"
+    _description = "Personal App Arrangement"
     _rec_name = "user_id"
 
     user_id = fields.Many2one(
-        "res.users", string="Benutzer", required=True, ondelete="cascade", index=True,
+        "res.users", string="User", required=True, ondelete="cascade", index=True,
     )
-    layout = fields.Json(string="Anordnung")
+    layout = fields.Json(string="Arrangement")
 
     _user_unique = models.Constraint(
         "UNIQUE(user_id)",
-        "Jeder Benutzer hat höchstens eine persönliche Anordnung.",
+        "Every user has at most one personal arrangement.",
     )

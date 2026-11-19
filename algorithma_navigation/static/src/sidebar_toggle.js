@@ -38,7 +38,7 @@ function initialCollapsed(key, type) {
 }
 
 function toggleLabel(collapsed) {
-    return collapsed ? _t("Navigation ausklappen") : _t("Navigation einklappen");
+    return collapsed ? _t("Expand navigation") : _t("Collapse navigation");
 }
 
 patch(NavBar.prototype, {
