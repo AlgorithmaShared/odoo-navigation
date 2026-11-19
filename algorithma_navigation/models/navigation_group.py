@@ -195,15 +195,23 @@ class NavigationGroup(models.Model):
         return result
 
     @api.model
-    def _get_shared_editor_groups(self, visible_roots):
-        """Every active shared group, empty ones included, for the editor."""
+    def _get_shared_editor_groups(self, visible_roots, keep_empty):
+        """The active shared groups the editor starts from.
+
+        :param keep_empty: also return groups without any app the caller may
+            open. Administrators need them to drag apps into a new group.
+            For everyone else such a group stays out: they learn the name of
+            a default group only when it holds one of their apps.
+        """
         editor_groups = []
         # Archived groups are not part of the navigation, whatever the caller context says.
         for group in self.sudo().with_context(active_test=True).search([]):
             items = group.item_ids.sorted(key=lambda item: (item.sequence, item.id))
+            menu_ids = [item.menu_id.id for item in items if item.menu_id.id in visible_roots]
+            if not menu_ids and not keep_empty:
+                continue
             editor_groups.append({
-                "id": group.id, "name": group.name,
-                "menu_ids": [item.menu_id.id for item in items if item.menu_id.id in visible_roots],
+                "id": group.id, "name": group.name, "menu_ids": menu_ids,
                 "color": group.color or False, "icon": group.icon or False,
             })
         return editor_groups
@@ -233,7 +241,8 @@ class NavigationGroup(models.Model):
 
         Unlike get_sidebar_groups(), empty groups are included so that apps can
         be dragged into a group that was just created. A user without a
-        personal arrangement starts from the shared default.
+        personal arrangement starts from the shared default; an ordinary user
+        gets only the default groups that hold an app that user may open.
         """
         visible_roots = self._get_sidebar_visible_root_ids()
         scope = self._resolve_sidebar_editor_scope(scope)
@@ -241,7 +250,9 @@ class NavigationGroup(models.Model):
         if scope == "personal" and personal_layout:
             editor_groups = self._clean_personal_groups(personal_layout.layout, visible_roots, keep_empty=True)
         else:
-            editor_groups = self._get_shared_editor_groups(visible_roots)
+            editor_groups = self._get_shared_editor_groups(
+                visible_roots, keep_empty=self._is_sidebar_administrator(),
+            )
         return {
             "editor_groups": editor_groups,
             "config": self.get_sidebar_config(),
