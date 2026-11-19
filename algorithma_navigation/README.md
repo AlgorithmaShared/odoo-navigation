@@ -113,6 +113,8 @@ requires its own compatibility check.
 
 ## Validation
 
+Version `20.0.1.4.0` passed 31 native Odoo tests and 20 helper checks on Odoo 20.0 with MuK AppsBar 20.0.1.2.8. Drag and drop, group creation, renaming and deletion were exercised by hand in a browser, in normal and developer mode; this repository contains no automated browser test for them.
+
 Validated on Odoo **20.0-20261102**, PostgreSQL 16 and MuK AppsBar
 **20.0.1.2.8** with the full MuK theme. Version `20.0.1.2.0` passed nineteen
 backend tests, eleven shared helper checks and fifteen Chromium workflows.
