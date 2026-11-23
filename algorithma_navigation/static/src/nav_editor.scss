@@ -1,0 +1,438 @@
+// =============================================================================
+// Navigation editor: drag and drop edit mode of the sidebar
+//
+// Every colour derives from the MuK sidebar variables ($mk-appbar-*), so the
+// editor is readable on a dark and on a light sidebar alike.
+// =============================================================================
+
+// ===== EDIT BUTTON (next to the "Navigation" control, administrators only) =====
+
+.algorithma_nav_edit_toggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    color: $mk-appbar-color;
+    cursor: pointer;
+    display: flex;
+    flex-shrink: 0;
+    // Deliberately smaller than the "Navigation" control next to it.
+    font-size: 11px;
+    height: 24px;
+    justify-content: center;
+    margin-inline-end: 8px;
+    padding: 0;
+    width: 24px;
+
+    &:hover,
+    &.active {
+        background: $mk-appbar-active;
+    }
+
+    &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: -3px;
+    }
+}
+
+// The 46-pixel rail has no room for editing.
+.mk_sidebar_type_small .algorithma_nav_edit_toggle {
+    display: none;
+}
+
+// ===== EDITOR REPLACES THE NORMAL LIST (wide sidebar only) =====
+
+.algorithma_nav_editor_host {
+    display: none;
+    list-style: none;
+}
+
+@include media-breakpoint-up(lg) {
+    .mk_sidebar_type_large .mk_apps_sidebar_panel.algorithma_nav_editing {
+        .algorithma_nav_editor_host {
+            display: block;
+        }
+
+        .algorithma_nav_group,
+        .algorithma_nav_direct_app {
+            display: none;
+        }
+    }
+
+    // Same width as the grouped sidebar, also while no group has an app yet.
+    .o_web_client.mk_sidebar_type_large:not(.o_home_menu_background):not(.o_fullscreen):not(.editor_has_snippets_hide_backend_navbar) {
+        > .mk_apps_sidebar_panel.algorithma_nav_editing {
+            width: 224px;
+        }
+    }
+}
+
+// ===== EDITOR LAYOUT =====
+
+.algorithma_nav_editor {
+    color: $mk-appbar-color;
+    font-size: 13px;
+    padding: 4px 8px 16px;
+    user-select: none;
+    white-space: normal;
+}
+
+.algorithma_nav_editor_hint {
+    font-size: 12px;
+    line-height: 1.35;
+    margin: 0 0 10px;
+    opacity: .75;
+}
+
+// ----- one group: header with grip and actions, then its drop zone -----
+
+.algorithma_nav_edit_group {
+    background: rgba($mk-appbar-color, .05);
+    border-inline-start: 3px solid var(--algorithma-group-accent, #{rgba($mk-appbar-color, .35)});
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.algorithma_nav_edit_header {
+    align-items: center;
+    background: var(--algorithma-group-tint, #{rgba($mk-appbar-color, .10)});
+    border-radius: 0 6px 0 0;
+    display: flex;
+    gap: 4px;
+    min-height: 36px;
+    padding: 2px 4px 2px 2px;
+
+    .algorithma_group_icon_svg {
+        color: var(--algorithma-group-accent, currentColor);
+    }
+}
+
+.algorithma_nav_edit_grip {
+    align-items: center;
+    cursor: grab;
+    display: flex;
+    flex-shrink: 0;
+    height: 32px;
+    justify-content: center;
+    opacity: .7;
+    width: 24px;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.algorithma_nav_edit_name {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.algorithma_nav_edit_name_input {
+    background: rgba($mk-appbar-color, .12);
+    border: 1px solid rgba($mk-appbar-color, .45);
+    border-radius: 4px;
+    color: inherit;
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 0;
+    padding: 3px 6px;
+    user-select: text;
+
+    &:focus {
+        outline: 2px solid $mk-appbar-active;
+        outline-offset: 0;
+    }
+}
+
+// Rename, style and delete appear when the header is hovered or focused, so the
+// group name keeps its room. They stay in the tab order while hidden.
+.algorithma_nav_edit_actions {
+    display: flex;
+    flex-shrink: 0;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.algorithma_nav_edit_header:hover .algorithma_nav_edit_actions,
+.algorithma_nav_edit_header:focus-within .algorithma_nav_edit_actions {
+    max-width: none;
+    opacity: 1;
+    overflow: visible;
+}
+
+// Touch screens have no hover: always show the buttons there.
+@media (hover: none) {
+    .algorithma_nav_edit_actions {
+        max-width: none;
+        opacity: 1;
+        overflow: visible;
+    }
+}
+
+.algorithma_nav_edit_action {
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    color: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    height: 26px;
+    opacity: .7;
+    padding: 0;
+    width: 24px;
+
+    &:hover,
+    &:focus-visible {
+        background: rgba($mk-appbar-color, .16);
+        opacity: 1;
+    }
+}
+
+// ----- drop zones and draggable app rows -----
+
+.algorithma_nav_dropzone {
+    list-style: none;
+    margin: 0;
+    // Keep an empty zone tall enough to drop into.
+    min-height: 40px;
+    padding: 4px;
+}
+
+.algorithma_nav_edit_app {
+    align-items: center;
+    border-radius: 5px;
+    cursor: grab;
+    display: flex;
+    gap: 8px;
+    padding: 6px 8px;
+
+    .mk_apps_sidebar_icon {
+        flex-shrink: 0;
+        height: 22px;
+        width: 22px;
+    }
+
+    &:hover {
+        background: rgba($mk-appbar-color, .12);
+    }
+}
+
+.algorithma_nav_edit_app_name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// The row or group that follows the pointer while it is dragged.
+.algorithma_nav_edit_app.o_dragged,
+.algorithma_nav_edit_group.o_dragged {
+    background: $mk-appbar-background;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    cursor: grabbing;
+    opacity: .95;
+    z-index: 1100;
+}
+
+// The gap that shows where the dragged row or group will land.
+.algorithma_nav_drop_placeholder {
+    background: rgba($mk-appbar-color, .10) !important;
+    border: 1px dashed rgba($mk-appbar-color, .6) !important;
+    border-radius: 5px;
+    box-shadow: none !important;
+}
+
+.algorithma_nav_drop_hint {
+    border: 1px dashed rgba($mk-appbar-color, .35);
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: .7;
+    padding: 8px;
+    text-align: center;
+}
+
+// ----- apps without a group -----
+
+.algorithma_nav_edit_ungrouped {
+    border: 1px solid rgba($mk-appbar-color, .2);
+    border-radius: 6px;
+}
+
+.algorithma_nav_edit_ungrouped_title {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: .8;
+    padding: 8px 8px 2px;
+}
+
+// ----- buttons below the groups -----
+
+.algorithma_nav_add_group,
+.algorithma_nav_editor_done {
+    align-items: center;
+    border-radius: 6px;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    font-size: 12px;
+    font-weight: 600;
+    gap: 8px;
+    justify-content: center;
+    padding: 8px;
+    width: 100%;
+
+    &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+}
+
+.algorithma_nav_add_group {
+    background: transparent;
+    border: 1px dashed rgba($mk-appbar-color, .45);
+    margin-bottom: 12px;
+
+    &:hover {
+        background: rgba($mk-appbar-color, .12);
+    }
+}
+
+.algorithma_nav_editor_done {
+    background: $mk-appbar-active;
+    border: 0;
+    margin-top: 12px;
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+}
+
+// ===== LAYER SWITCH (administrators) AND RESET =====
+
+.algorithma_nav_scope {
+    background: rgba($mk-appbar-color, .10);
+    border-radius: 6px;
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+    padding: 2px;
+}
+
+.algorithma_nav_scope_option {
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    color: inherit;
+    cursor: pointer;
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: .7;
+    padding: 4px 6px;
+
+    &.active {
+        background: $mk-appbar-background;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+        opacity: 1;
+    }
+
+    &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: -2px;
+    }
+}
+
+.algorithma_nav_reset {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    display: block;
+    font-size: 12px;
+    margin: -4px 0 10px;
+    opacity: .8;
+    padding: 0;
+    text-align: start;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus-visible {
+        opacity: 1;
+    }
+}
+
+// ===== COLOUR AND SYMBOL CHOICES OF A GROUP =====
+
+.algorithma_nav_style_panel {
+    border-bottom: 1px solid rgba($mk-appbar-color, .12);
+    padding: 6px 6px 0;
+}
+
+.algorithma_nav_style_row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.algorithma_nav_style_color,
+.algorithma_nav_style_icon,
+.algorithma_nav_style_none {
+    align-items: center;
+    background: transparent;
+    border: 1px solid rgba($mk-appbar-color, .3);
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 12px;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+
+    &[aria-pressed="true"] {
+        outline: 2px solid $mk-appbar-color;
+        outline-offset: 1px;
+    }
+
+    &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 1px;
+    }
+}
+
+.algorithma_nav_style_color {
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+}
+
+.algorithma_nav_style_icon {
+    border-radius: 4px;
+    height: 22px;
+    width: 22px;
+
+    .algorithma_group_icon_svg {
+        height: 14px;
+        width: 14px;
+    }
+}
+
+// "none" follows the size of the row it ends.
+.algorithma_nav_style_none {
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+}
+
+.algorithma_nav_style_icon ~ .algorithma_nav_style_none {
+    border-radius: 4px;
+    height: 22px;
+    width: 22px;
+}

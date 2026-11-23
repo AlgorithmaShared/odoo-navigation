@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_navigation_group_system,App-Gruppen verwalten,model_algorithma_navigation_group,base.group_system,1,1,1,1
-access_navigation_item_system,App-Zuordnungen verwalten,model_algorithma_navigation_item,base.group_system,1,1,1,1
+access_navigation_group_system,Manage app groups,model_algorithma_navigation_group,base.group_system,1,1,1,1
+access_navigation_item_system,Manage app assignments,model_algorithma_navigation_item,base.group_system,1,1,1,1
+access_navigation_user_layout_system,Manage personal arrangements,model_algorithma_navigation_user_layout,base.group_system,1,1,1,1
