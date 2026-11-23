@@ -4,7 +4,7 @@
         <field name="name">algorithma.navigation.item.list</field>
         <field name="model">algorithma.navigation.item</field>
         <field name="arch" type="xml">
-            <list string="App-Zuordnungen" editable="bottom">
+            <list string="App Assignments" editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="menu_id" domain="[('parent_id', '=', False)]"
                        context="{'ir.ui.menu.full_list': True}"
@@ -18,7 +18,7 @@
         <field name="name">algorithma.navigation.item.form</field>
         <field name="model">algorithma.navigation.item</field>
         <field name="arch" type="xml">
-            <form string="App-Zuordnung">
+            <form string="App Assignment">
                 <sheet>
                     <group>
                         <field name="menu_id" domain="[('parent_id', '=', False)]"
@@ -29,12 +29,11 @@
                         <field name="hidden"/>
                     </group>
                     <div class="text-muted">
-                        Lassen Sie „Gruppe“ leer, um die App direkt in der Seitenleiste
-                        anzuzeigen. Nicht zugeordnete Apps und Apps archivierter Gruppen
-                        werden ebenfalls direkt angezeigt. Ausgeblendete Apps bleiben
-                        für alle Benutzer in der Seitenleiste verborgen, auch ohne Gruppe
-                        oder bei ausgeschalteter Gruppierung.
-                        Nach dem Speichern die Seite neu laden.
+                        Leave “Group” empty to show the app directly in the sidebar.
+                        Unassigned apps and apps of archived groups are shown directly
+                        as well. Hidden apps stay hidden from the sidebar for all users,
+                        also without a group or with grouping switched off.
+                        Reload the page after saving.
                     </div>
                 </sheet>
             </form>
@@ -44,32 +43,32 @@
         <field name="name">algorithma.navigation.item.search</field>
         <field name="model">algorithma.navigation.item</field>
         <field name="arch" type="xml">
-            <search string="App-Zuordnungen">
+            <search string="App Assignments">
                 <field name="menu_id"/>
                 <field name="group_id"/>
-                <filter name="ungrouped" string="Ohne Gruppe" domain="[('group_id', '=', False)]"/>
-                <filter name="hidden" string="Ausgeblendet" domain="[('hidden', '=', True)]"/>
+                <filter name="ungrouped" string="Without group" domain="[('group_id', '=', False)]"/>
+                <filter name="hidden" string="Hidden" domain="[('hidden', '=', True)]"/>
                 <group>
-                    <filter name="group_by_group" string="Gruppe" context="{'group_by': 'group_id'}"/>
+                    <filter name="group_by_group" string="Group" context="{'group_by': 'group_id'}"/>
                 </group>
             </search>
         </field>
     </record>
     <record id="action_navigation_items" model="ir.actions.act_window">
-        <field name="name">App-Zuordnungen</field>
+        <field name="name">App Assignments</field>
         <field name="res_model">algorithma.navigation.item</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_navigation_item_search"/>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Eine App-Zuordnung anlegen</p>
-            <p>Wählen Sie eine App und optional eine Gruppe. Ohne Gruppe erscheint die App direkt in der Seitenleiste.</p>
+            <p class="o_view_nocontent_smiling_face">Create an app assignment</p>
+            <p>Choose an app and optionally a group. Without a group the app appears directly in the sidebar.</p>
         </field>
     </record>
     <record id="view_navigation_group_list" model="ir.ui.view">
         <field name="name">algorithma.navigation.group.list</field>
         <field name="model">algorithma.navigation.group</field>
         <field name="arch" type="xml">
-            <list string="App-Gruppen">
+            <list string="App Groups">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="icon" widget="algorithma_group_icon"/>
@@ -82,9 +81,9 @@
         <field name="name">algorithma.navigation.group.form</field>
         <field name="model">algorithma.navigation.group</field>
         <field name="arch" type="xml">
-            <form string="App-Gruppe">
+            <form string="App Group">
                 <sheet>
-                    <widget name="web_ribbon" title="Archiviert" bg_color="text-bg-warning" invisible="active"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-warning" invisible="active"/>
                     <group>
                         <field name="name"/>
                         <field name="icon" widget="algorithma_group_icon"/>
@@ -102,18 +101,17 @@
                         </list>
                     </field>
                     <div class="text-muted">
-                        Jede App kann einer Gruppe zugeordnet werden. Nicht zugeordnete Apps
-                        und Apps archivierter Gruppen erscheinen direkt in der Seitenleiste,
-                        sofern sie nicht ausgeblendet sind.
-                        Benutzer sehen weiterhin nur Apps, für die sie berechtigt sind.
-                        „In Seitenleiste ausblenden“ gilt für alle Benutzer und entzieht
-                        keine App-Berechtigungen. Die Auswahl bleibt beim Archivieren
-                        oder Löschen der Gruppe erhalten. Unter „App-Zuordnungen“ können
-                        Sie eine App auch ohne Gruppe verwalten oder ausblenden.
-                        Nach dem Speichern die Seite neu laden, um die Navigation zu aktualisieren.
+                        Every app can be assigned to one group. Unassigned apps and apps
+                        of archived groups appear directly in the sidebar unless they are
+                        hidden. Users still only see apps they are permitted to use.
+                        “Hide in sidebar” applies to all users and takes away no app
+                        permissions. The choice stays when the group is archived or
+                        deleted. Under “App Assignments” you can also manage or hide an
+                        app without a group.
+                        Reload the page after saving to refresh the navigation.
                     </div>
                     <button name="%(action_navigation_items)d" type="action"
-                            string="App-Zuordnungen verwalten" class="btn-link" icon="oi-arrow-right"
+                            string="Manage app assignments" class="btn-link" icon="oi-arrow-right"
                             groups="base.group_system"/>
                 </sheet>
             </form>
@@ -123,27 +121,27 @@
         <field name="name">algorithma.navigation.group.search</field>
         <field name="model">algorithma.navigation.group</field>
         <field name="arch" type="xml">
-            <search string="App-Gruppen">
+            <search string="App Groups">
                 <field name="name"/>
-                <filter name="archived" string="Archiviert" domain="[('active', '=', False)]"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
             </search>
         </field>
     </record>
     <record id="action_navigation_groups" model="ir.actions.act_window">
-        <field name="name">App-Gruppen</field>
+        <field name="name">App Groups</field>
         <field name="res_model">algorithma.navigation.group</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_navigation_group_search"/>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Eine App-Gruppe anlegen</p>
-            <p>Ordnen Sie die vorhandenen Apps in frei benannte Gruppen ein.</p>
+            <p class="o_view_nocontent_smiling_face">Create an app group</p>
+            <p>Sort the existing apps into groups that you name freely.</p>
         </field>
     </record>
     <menuitem id="menu_navigation" name="Navigation" parent="base.menu_administration"
               groups="base.group_system" sequence="45"/>
-    <menuitem id="menu_navigation_groups" name="App-Gruppen" parent="menu_navigation"
+    <menuitem id="menu_navigation_groups" name="App Groups" parent="menu_navigation"
               action="action_navigation_groups" groups="base.group_system" sequence="10"/>
-    <menuitem id="menu_navigation_items" name="App-Zuordnungen" parent="menu_navigation"
+    <menuitem id="menu_navigation_items" name="App Assignments" parent="menu_navigation"
               action="action_navigation_items" groups="base.group_system" sequence="20"/>
     <record id="res_config_settings_view_form_navigation" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.algorithma.navigation</field>
@@ -152,15 +150,15 @@
         <field name="arch" type="xml">
             <xpath expr="//app[@name='general_settings']" position="inside">
                 <block title="Navigation" name="algorithma_navigation" groups="base.group_system">
-                    <setting id="algorithma_navigation_grouping" string="Apps gruppieren"
-                             help="Gilt für alle Benutzer. Ohne Gruppierung erscheinen die Apps direkt. Gruppen und ausgeblendete Apps bleiben gespeichert.">
+                    <setting id="algorithma_navigation_grouping" string="Group apps"
+                             help="Applies to all users. Without grouping the apps appear directly. Groups and hidden apps stay stored.">
                         <field name="algorithma_navigation_grouping_enabled"/>
                         <div class="content-group mt8">
                             <button name="%(action_navigation_groups)d" type="action"
-                                    string="App-Gruppen verwalten" class="btn-link" icon="oi-arrow-right"/>
+                                    string="Manage app groups" class="btn-link" icon="oi-arrow-right"/>
                             <br/>
                             <button name="%(action_navigation_items)d" type="action"
-                                    string="App-Zuordnungen verwalten" class="btn-link" icon="oi-arrow-right"/>
+                                    string="Manage app assignments" class="btn-link" icon="oi-arrow-right"/>
                         </div>
                     </setting>
                 </block>

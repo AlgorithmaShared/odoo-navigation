@@ -5,19 +5,19 @@
             <div t-if="this.props.readonly" class="algorithma_color_readonly">
                 <span class="algorithma_color_swatch" t-att-style="this.value ? 'background-color:' + this.value : ''"/>
                 <span t-if="this.value" t-out="this.value"/>
-                <span t-else="">Keine Farbe</span>
+                <span t-else="">No color</span>
             </div>
             <t t-else="">
                 <div class="algorithma_color_controls">
                     <input type="color" t-att-id="this.props.id" t-att-value="this.value || '#64748B'"
-                           aria-label="Gruppenfarbe wählen" title="Gruppenfarbe wählen"
+                           aria-label="Choose a group color" title="Choose a group color"
                            t-on-change="this.onColorChange"/>
                     <span t-if="this.value" class="algorithma_color_value" t-out="this.value"/>
-                    <span t-else="">Keine Farbe</span>
+                    <span t-else="">No color</span>
                     <button type="button" class="btn btn-link btn-sm" data-color=""
-                            t-on-click="() => this.setColor(false)">Zurücksetzen</button>
+                            t-on-click="() => this.setColor(false)">Reset</button>
                 </div>
-                <div class="algorithma_color_presets" role="group" aria-label="Vorgegebene Gruppenfarben">
+                <div class="algorithma_color_presets" role="group" aria-label="Preset group colors">
                     <button t-foreach="this.presets" t-as="color" t-key="color" type="button"
                             class="algorithma_color_preset" t-att-data-color="color"
                             t-att-style="'background-color:' + color" t-att-title="color" t-att-aria-label="color"
@@ -41,7 +41,7 @@
                 <span t-out="this.currentLabel"/>
             </div>
             <t t-if="!this.props.readonly">
-                <div class="algorithma_icon_choices" role="group" aria-label="Gruppensymbol wählen">
+                <div class="algorithma_icon_choices" role="group" aria-label="Choose a group symbol">
                     <button t-foreach="this.options" t-as="option" t-key="option.key" type="button"
                             class="algorithma_icon_choice" t-att-data-icon="option.key"
                             t-att-title="option.label" t-att-aria-label="option.label"
@@ -52,7 +52,7 @@
                 </div>
                 <button type="button" class="btn btn-link btn-sm algorithma_icon_clear" data-icon=""
                         t-att-aria-pressed="!this.value ? 'true' : 'false'"
-                        t-on-click="() => this.setIcon(false)">Kein Symbol</button>
+                        t-on-click="() => this.setIcon(false)">No symbol</button>
             </t>
         </div>
     </t>

@@ -72,16 +72,21 @@ patch(AppsBar.prototype, {
                 const config = await this.algorithmaNavigationOrm.call(
                     "algorithma.navigation.group", "get_sidebar_config", []
                 );
-                this.algorithmaNavigationState.groups = Array.isArray(config?.groups) ? config.groups : [];
-                this.algorithmaNavigationState.hiddenMenuIds = Array.isArray(config?.hidden_menu_ids)
-                    ? config.hidden_menu_ids : [];
-                this.algorithmaNavigationState.groupingEnabled = config?.grouping_enabled !== false;
+                this.algorithmaApplyNavigationConfig(config);
                 this.algorithmaOpenActiveGroup();
             } catch {
                 this.algorithmaNavigationState.groups = [];
                 this.algorithmaNavigationState.hiddenMenuIds = [];
             }
         });
+    },
+
+    /** Take over a sidebar configuration from the server (initial load and editor saves). */
+    algorithmaApplyNavigationConfig(config) {
+        this.algorithmaNavigationState.groups = Array.isArray(config?.groups) ? config.groups : [];
+        this.algorithmaNavigationState.hiddenMenuIds = Array.isArray(config?.hidden_menu_ids)
+            ? config.hidden_menu_ids : [];
+        this.algorithmaNavigationState.groupingEnabled = config?.grouping_enabled !== false;
     },
 
     get algorithmaNavigationApps() {
