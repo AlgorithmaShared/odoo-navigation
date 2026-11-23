@@ -1,0 +1,642 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* algorithma_navigation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0-20261102\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-19 10:52+0000\n"
+"PO-Revision-Date: 2026-11-19 10:52+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+"Language: de\n"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__active
+msgid "Active"
+msgstr "Aktiv"
+
+#. module: algorithma_navigation
+#: model:ir.model.constraint,message:algorithma_navigation.constraint_algorithma_navigation_item_menu_unique
+msgid ""
+"An app can only be assigned to one group. Remove the existing assignment "
+"first."
+msgstr "Eine App kann nur einer Gruppe zugeordnet werden. Entfernen Sie zuerst die bestehende Zuordnung."
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "An app group needs a name."
+msgstr "Eine App-Gruppe benötigt einen Namen."
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__menu_id
+msgid "App"
+msgstr "App"
+
+#. module: algorithma_navigation
+#: model:ir.model,name:algorithma_navigation.model_algorithma_navigation_item
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_form
+msgid "App Assignment"
+msgstr "App-Zuordnung"
+
+#. module: algorithma_navigation
+#: model:ir.actions.act_window,name:algorithma_navigation.action_navigation_items
+#: model:ir.ui.menu,name:algorithma_navigation.menu_navigation_items
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_list
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_search
+msgid "App Assignments"
+msgstr "App-Zuordnungen"
+
+#. module: algorithma_navigation
+#: model:ir.model,name:algorithma_navigation.model_algorithma_navigation_group
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_form
+msgid "App Group"
+msgstr "App-Gruppe"
+
+#. module: algorithma_navigation
+#: model:ir.actions.act_window,name:algorithma_navigation.action_navigation_groups
+#: model:ir.ui.menu,name:algorithma_navigation.menu_navigation_groups
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_list
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_search
+msgid "App Groups"
+msgstr "App-Gruppen"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,help:algorithma_navigation.field_res_config_settings__algorithma_navigation_grouping_enabled
+msgid ""
+"Applies to all users of this database. Without grouping the visible apps are"
+" shown directly. Existing groups and hidden apps stay stored."
+msgstr "Gilt für alle Benutzer dieser Datenbank. Ohne Gruppierung werden die sichtbaren Apps direkt angezeigt. Vorhandene Gruppen und ausgeblendete Apps bleiben gespeichert."
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.res_config_settings_view_form_navigation
+msgid ""
+"Applies to all users. Without grouping the apps appear directly. Groups and "
+"hidden apps stay stored."
+msgstr "Gilt für alle Benutzer. Ohne Gruppierung erscheinen die Apps direkt. Gruppen und ausgeblendete Apps bleiben gespeichert."
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__item_ids
+msgid "Apps"
+msgstr "Apps"
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_form
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_search
+msgid "Archived"
+msgstr "Archiviert"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Arrange groups and apps"
+msgstr "Gruppen und Apps anordnen"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__layout
+msgid "Arrangement"
+msgstr "Anordnung"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__briefcase
+msgid "Briefcase"
+msgstr "Aktentasche"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__building
+msgid "Building"
+msgstr "Gebäude"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__calendar
+msgid "Calendar"
+msgstr "Kalender"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__chart
+msgid "Chart"
+msgstr "Diagramm"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.xml:0
+msgid "Choose a group color"
+msgstr "Gruppenfarbe wählen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.xml:0
+msgid "Choose a group symbol"
+msgstr "Gruppensymbol wählen"
+
+#. module: algorithma_navigation
+#: model_terms:ir.actions.act_window,help:algorithma_navigation.action_navigation_items
+msgid ""
+"Choose an app and optionally a group. Without a group the app appears "
+"directly in the sidebar."
+msgstr "Wählen Sie eine App und optional eine Gruppe. Ohne Gruppe erscheint die App direkt in der Seitenleiste."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/sidebar_toggle.js:0
+msgid "Collapse navigation"
+msgstr "Navigation einklappen"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__color
+msgid "Color"
+msgstr "Farbe"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Color and symbol"
+msgstr "Farbe und Symbol"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Color of the group"
+msgstr "Farbe der Gruppe"
+
+#. module: algorithma_navigation
+#: model:ir.model,name:algorithma_navigation.model_res_config_settings
+msgid "Config Settings"
+msgstr "Konfigurationseinstellungen"
+
+#. module: algorithma_navigation
+#: model_terms:ir.actions.act_window,help:algorithma_navigation.action_navigation_items
+msgid "Create an app assignment"
+msgstr "Eine App-Zuordnung anlegen"
+
+#. module: algorithma_navigation
+#: model_terms:ir.actions.act_window,help:algorithma_navigation.action_navigation_groups
+msgid "Create an app group"
+msgstr "Eine App-Gruppe anlegen"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__create_uid
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__create_uid
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__create_uid
+msgid "Created by"
+msgstr "Erstellt von"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__create_date
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__create_date
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__create_date
+msgid "Created on"
+msgstr "Erstellt am"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Default for all users without an arrangement of their own."
+msgstr "Standard für alle Benutzer ohne eigene Anordnung."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Delete"
+msgstr "Löschen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Delete group"
+msgstr "Gruppe löschen"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__display_name
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__display_name
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__display_name
+msgid "Display Name"
+msgstr "Anzeigename"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Done arranging"
+msgstr "Fertig"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Drag apps here"
+msgstr "Apps hierher ziehen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Drag apps here to take them out of their group"
+msgstr "Apps hierher ziehen, um sie aus der Gruppe zu lösen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Edit the arrangement for"
+msgstr "Anordnung bearbeiten für"
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_form
+msgid ""
+"Every app can be assigned to one group. Unassigned apps and apps\n"
+"                        of archived groups appear directly in the sidebar unless they are\n"
+"                        hidden. Users still only see apps they are permitted to use.\n"
+"                        “Hide in sidebar” applies to all users and takes away no app\n"
+"                        permissions. The choice stays when the group is archived or\n"
+"                        deleted. Under “App Assignments” you can also manage or hide an\n"
+"                        app without a group.\n"
+"                        Reload the page after saving to refresh the navigation."
+msgstr "Jede App kann einer Gruppe zugeordnet werden. Nicht zugeordnete Apps und Apps archivierter Gruppen erscheinen direkt in der Seitenleiste, sofern sie nicht ausgeblendet sind. Benutzer sehen weiterhin nur Apps, für die sie berechtigt sind. „In Seitenleiste ausblenden“ gilt für alle Benutzer und entzieht keine App-Berechtigungen. Die Auswahl bleibt beim Archivieren oder Löschen der Gruppe erhalten. Unter „App-Zuordnungen“ können Sie eine App auch ohne Gruppe verwalten oder ausblenden. Nach dem Speichern die Seite neu laden, um die Navigation zu aktualisieren."
+
+#. module: algorithma_navigation
+#: model:ir.model.constraint,message:algorithma_navigation.constraint_algorithma_navigation_user_layout_user_unique
+msgid "Every user has at most one personal arrangement."
+msgstr "Jeder Benutzer hat höchstens eine persönliche Anordnung."
+
+#. module: algorithma_navigation
+#: model:algorithma.navigation.group,name:algorithma_navigation.group_everyday
+msgid "Everyday"
+msgstr "Alltag"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/sidebar_toggle.js:0
+msgid "Expand navigation"
+msgstr "Navigation ausklappen"
+
+#. module: algorithma_navigation
+#: model:algorithma.navigation.group,name:algorithma_navigation.group_finance
+msgid "Finance"
+msgstr "Finanzen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Finish arranging"
+msgstr "Anordnen beenden"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__folder
+msgid "Folder"
+msgstr "Ordner"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "For everyone"
+msgstr "Für alle"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "For me"
+msgstr "Für mich"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__group_id
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_search
+msgid "Group"
+msgstr "Gruppe"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_res_config_settings__algorithma_navigation_grouping_enabled
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.res_config_settings_view_form_navigation
+msgid "Group apps"
+msgstr "Apps gruppieren"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.js:0
+msgid "Group color"
+msgstr "Gruppenfarbe"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.js:0
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__icon
+msgid "Group symbol"
+msgstr "Gruppensymbol"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__heart
+msgid "Heart"
+msgstr "Herz"
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_search
+msgid "Hidden"
+msgstr "Ausgeblendet"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__hidden
+msgid "Hide in sidebar"
+msgstr "In Seitenleiste ausblenden"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,help:algorithma_navigation.field_algorithma_navigation_item__hidden
+msgid ""
+"Hides this app from the sidebar for all users. Its app permissions and other"
+" ways to reach it stay as they are."
+msgstr "Blendet diese App für alle Benutzer aus der Seitenleiste aus. Ihre App-Berechtigungen und andere Zugriffswege bleiben erhalten."
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__home
+msgid "Home"
+msgstr "Haus"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__id
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__id
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__id
+msgid "ID"
+msgstr "ID"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__write_uid
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__write_uid
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__write_uid
+msgid "Last Updated by"
+msgstr "Zuletzt aktualisiert von"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__write_date
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__write_date
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__write_date
+msgid "Last Updated on"
+msgstr "Zuletzt aktualisiert am"
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_form
+msgid ""
+"Leave “Group” empty to show the app directly in the sidebar.\n"
+"                        Unassigned apps and apps of archived groups are shown directly\n"
+"                        as well. Hidden apps stay hidden from the sidebar for all users,\n"
+"                        also without a group or with grouping switched off.\n"
+"                        Reload the page after saving."
+msgstr "Lassen Sie „Gruppe“ leer, um die App direkt in der Seitenleiste anzuzeigen. Nicht zugeordnete Apps und Apps archivierter Gruppen werden ebenfalls direkt angezeigt. Ausgeblendete Apps bleiben für alle Benutzer in der Seitenleiste verborgen, auch ohne Gruppe oder bei ausgeschalteter Gruppierung. Nach dem Speichern die Seite neu laden."
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.res_config_settings_view_form_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_group_form
+msgid "Manage app assignments"
+msgstr "App-Zuordnungen verwalten"
+
+#. module: algorithma_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.res_config_settings_view_form_navigation
+msgid "Manage app groups"
+msgstr "App-Gruppen verwalten"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Move group"
+msgstr "Gruppe verschieben"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__name
+msgid "Name"
+msgstr "Name"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Name of the group"
+msgstr "Name der Gruppe"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/sidebar_toggle.xml:0
+#: model:ir.ui.menu,name:algorithma_navigation.menu_navigation
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.res_config_settings_view_form_navigation
+msgid "Navigation"
+msgstr "Navigation"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "New group"
+msgstr "Neue Gruppe"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.xml:0
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "No color"
+msgstr "Keine Farbe"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.js:0
+#: code:addons/algorithma_navigation/static/src/group_style_fields.xml:0
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "No symbol"
+msgstr "Kein Symbol"
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "Only administrators can arrange the navigation for everyone."
+msgstr "Nur Administratoren können die Navigation für alle anordnen."
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/res_config_settings.py:0
+msgid "Only administrators can configure the navigation."
+msgstr "Nur Administratoren können die Navigation konfigurieren."
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "Only apps with a main menu can be assigned, not submenus."
+msgstr "Es können nur Apps mit einem Hauptmenü zugeordnet werden, keine Untermenüs."
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,help:algorithma_navigation.field_algorithma_navigation_group__color
+msgid "Optional color in the format #RRGGBB."
+msgstr "Optionale Farbe im Format #RRGGBB."
+
+#. module: algorithma_navigation
+#: model:algorithma.navigation.group,name:algorithma_navigation.group_operations
+msgid "Orders & Projects"
+msgstr "Aufträge & Projekte"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__users
+msgid "People"
+msgstr "Personen"
+
+#. module: algorithma_navigation
+#: model:algorithma.navigation.group,name:algorithma_navigation.group_people
+msgid "People & Operations"
+msgstr "Personal & Betrieb"
+
+#. module: algorithma_navigation
+#: model:ir.model,name:algorithma_navigation.model_algorithma_navigation_user_layout
+msgid "Personal App Arrangement"
+msgstr "Persönliche App-Anordnung"
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "Please enter a color in the format #RRGGBB, for example #2563EB."
+msgstr "Bitte eine Farbe im Format #RRGGBB angeben, zum Beispiel #2563EB."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.xml:0
+msgid "Preset group colors"
+msgstr "Vorgegebene Gruppenfarben"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.js:0
+msgid "Preview"
+msgstr "Vorschau"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__receipt
+msgid "Receipt"
+msgstr "Beleg"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Rename group"
+msgstr "Gruppe umbenennen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/group_style_fields.xml:0
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Reset to default"
+msgstr "Auf Standard zurücksetzen"
+
+#. module: algorithma_navigation
+#: model:algorithma.navigation.group,name:algorithma_navigation.group_sales
+msgid "Sales"
+msgstr "Vertrieb"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_group__sequence
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_item__sequence
+msgid "Sequence"
+msgstr "Reihenfolge"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__settings
+msgid "Settings"
+msgstr "Einstellungen"
+
+#. module: algorithma_navigation
+#: model_terms:ir.actions.act_window,help:algorithma_navigation.action_navigation_groups
+msgid "Sort the existing apps into groups that you name freely."
+msgstr "Ordnen Sie die vorhandenen Apps in frei benannte Gruppen ein."
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__star
+msgid "Star"
+msgstr "Stern"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+msgid "Symbol of the group"
+msgstr "Symbol der Gruppe"
+
+#. module: algorithma_navigation
+#: model:algorithma.navigation.group,name:algorithma_navigation.group_system
+msgid "System"
+msgstr "System"
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "The app navigation is only available to internal users."
+msgstr "Die App-Navigation ist nur für interne Benutzer verfügbar."
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "The arrangement of the navigation is invalid. Please reload the page."
+msgstr "Die Anordnung der Navigation ist ungültig. Bitte die Seite neu laden."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid ""
+"The group “%s” will be deleted. Its apps stay and appear without a group "
+"afterwards."
+msgstr "Die Gruppe „%s“ wird gelöscht. Ihre Apps bleiben erhalten und erscheinen danach ohne Gruppe."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "This is the default. Your first change creates your own arrangement."
+msgstr "Das ist der Standard. Mit deiner ersten Änderung entsteht deine eigene Anordnung."
+
+#. module: algorithma_navigation
+#. odoo-python
+#: code:addons/algorithma_navigation/models/navigation_group.py:0
+msgid "Unknown layer of the navigation."
+msgstr "Unbekannter Bereich für die Navigation."
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,field_description:algorithma_navigation.field_algorithma_navigation_user_layout__user_id
+msgid "User"
+msgstr "Benutzer"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields.selection,name:algorithma_navigation.selection__algorithma_navigation_group__icon__truck
+msgid "Vehicle"
+msgstr "Fahrzeug"
+
+#. module: algorithma_navigation
+#: model:ir.model.fields,help:algorithma_navigation.field_algorithma_navigation_item__group_id
+msgid ""
+"Without a group the app appears directly in the sidebar. Hiding stays in "
+"place whatever the group assignment is."
+msgstr "Ohne Gruppe erscheint die App direkt in der Seitenleiste. Das Ausblenden bleibt unabhängig von der Gruppenzuordnung erhalten."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.xml:0
+#: model_terms:ir.ui.view,arch_db:algorithma_navigation.view_navigation_item_search
+msgid "Without group"
+msgstr "Ohne Gruppe"
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid ""
+"Your own arrangement will be deleted. You will see the default again "
+"afterwards."
+msgstr "Deine eigene Anordnung wird gelöscht. Du siehst danach wieder den Standard."
+
+#. module: algorithma_navigation
+#. odoo-javascript
+#: code:addons/algorithma_navigation/static/src/nav_editor.js:0
+msgid "Your own arrangement. It applies to you only."
+msgstr "Deine eigene Anordnung. Sie gilt nur für dich."
